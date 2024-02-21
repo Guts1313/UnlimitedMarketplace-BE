@@ -1,0 +1,35 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+build:
+  stage: build
+  script:
+    - gradlew.bat build -x test
+  artifacts:
+    paths:
+      - build/libs/
+    expire_in: 1 hour
+
+test:
+  stage: test
+  image: gradle:7.3-jdk11
+  script:
+    - gradle test  # Run the tests
+
+deploy_staging:
+  stage: deploy
+  image: alpine:latest  # This could be any image appropriate for your deployment
+  script:
+    - echo "Deploying to staging server..."
+    # Add your deployment scripts here, for example:
+    # - scp build/libs/myapp.jar user@staging-server:/path/to/app
+  environment:
+    name: staging
+    url: http://staging.example.com
+  only:
+    - main  # or master, depending on your default branch's name
