@@ -8,13 +8,12 @@ variables:
 
 build:
   stage: build
-  image: gradle:7.3-jdk11  # Use an image with Gradle and JDK installed
   script:
-    - gradle build -x test  # Compile the code and skip tests
+    - gradlew.bat build -x test
   artifacts:
     paths:
-      - build/libs/  # Store the built artifacts
-    expire_in: 1 hour  # Set how long to keep the artifacts before they expire
+      - build/libs/
+    expire_in: 1 hour
 
 test:
   stage: test
