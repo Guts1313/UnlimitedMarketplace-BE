@@ -6,20 +6,16 @@ stages:
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
+before_script:
+  # Assuming Java is installed at this path; change it to your Java installation path if different
+  - set JAVA_HOME=C:\Users\acidburn\.jdks\corretto-19.0.2
+  - set PATH=%JAVA_HOME%\bin;%PATH%
+
 build:
   stage: build
-  image: openjdk:11  # Use an image with JDK installed
-  variables:
-    JAVA_HOME: "/docker-java-home"  # This is often the Java home in official JDK Docker images
   script:
-    - cd unlimitedmarketplace  # Change directory to where gradlew.bat is located
-    - .\gradlew.bat build -x test  # Run the Gradle build command
-
-  artifacts:
-    paths:
-      - build/libs/
-    expire_in: 1 hour
-
+    - cd unlimitedmarketplace
+    - gradlew.bat build -x test  # Run the Gradle build command
 
   artifacts:
     paths:
@@ -28,16 +24,15 @@ build:
 
 test:
   stage: test
-  image: gradle:7.3-jdk11
   script:
-    - ./gradlew test  # Run the tests, use ./ for Linux paths
+    - cd unlimitedmarketplace
+    - gradlew.bat test  # Run the Gradle tests
 
 deploy_staging:
   stage: deploy
-  image: alpine:latest  # This might require a different image based on what you're deploying
   script:
-    - echo "Deploying to staging server..."
-    # Your deployment scripts here
+    - echo Deploying to staging server...
+    # Add your Windows-specific deployment scripts here
   environment:
     name: staging
     url: http://staging.example.com
