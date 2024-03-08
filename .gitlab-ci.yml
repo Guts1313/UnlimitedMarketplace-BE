@@ -8,7 +8,7 @@ variables:
 
 build:
   stage: build
-   script:
+  script:
     - cd semester3/unlimitedmarketplace
     - .\gradlew.bat build -x test
 
