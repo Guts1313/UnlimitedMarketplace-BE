@@ -11,6 +11,7 @@ build:
   image: gradle:7.3-jdk11  # Use an image with Gradle and JDK installed
   script:
     - echo "JAVA_HOME is set to $JAVA_HOME"
+    - cd unlimitedmarketplace
     - ./gradlew build -x test  # Run the Gradle build command, note ./ for Linux paths
 
   artifacts:
