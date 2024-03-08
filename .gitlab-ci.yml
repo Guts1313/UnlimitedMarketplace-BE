@@ -8,14 +8,14 @@ variables:
 
 before_script:
   # Assuming Java is installed at this path; change it to your Java installation path if different
-  - set JAVA_HOME=C:\Users\acidburn\.jdks\corretto-19.0.2
-  - set PATH=%JAVA_HOME%\bin;%PATH%
+  - $Env:JAVA_HOME = "C:\Users\acidburn\.jdks\corretto-19.0.2"
+  - $Env:PATH = "$Env:JAVA_HOME\bin;$Env:PATH"
 
 build:
   stage: build
   script:
     - cd unlimitedmarketplace
-    - gradlew.bat build -x test  # Run the Gradle build command
+    - .\gradlew.bat build -x test  # Notice the change to PowerShell-friendly call
 
   artifacts:
     paths:
@@ -26,12 +26,12 @@ test:
   stage: test
   script:
     - cd unlimitedmarketplace
-    - gradlew.bat test  # Run the Gradle tests
+    - .\gradlew.bat test  # Again, adjusted for PowerShell
 
 deploy_staging:
   stage: deploy
   script:
-    - echo Deploying to staging server...
+    - echo "Deploying to staging server..."
     # Add your Windows-specific deployment scripts here
   environment:
     name: staging
