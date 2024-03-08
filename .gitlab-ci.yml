@@ -5,16 +5,13 @@ stages:
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  JAVA_HOME: "C:\Users\acidburn\.jdks\corretto-19.0.2"
 
 build:
   stage: build
+  image: gradle:7.3-jdk11  # Use an image with Gradle and JDK installed
   script:
     - echo "JAVA_HOME is set to $JAVA_HOME"
-
-    - cd unlimitedmarketplace  # Change directory to where gradlew.bat is located
-    - .\gradlew.bat build -x test  # Run the Gradle build command
-
+    - ./gradlew build -x test  # Run the Gradle build command, note ./ for Linux paths
 
   artifacts:
     paths:
@@ -25,17 +22,16 @@ test:
   stage: test
   image: gradle:7.3-jdk11
   script:
-    - gradle test  # Run the tests
+    - ./gradlew test  # Run the tests, use ./ for Linux paths
 
 deploy_staging:
   stage: deploy
-  image: alpine:latest  # This could be any image appropriate for your deployment
+  image: alpine:latest  # This might require a different image based on what you're deploying
   script:
     - echo "Deploying to staging server..."
-    # Add your deployment scripts here, for example:
-    # - scp build/libs/myapp.jar user@staging-server:/path/to/app
+    # Your deployment scripts here
   environment:
     name: staging
     url: http://staging.example.com
   only:
-    - main  # or master, depending on your default branch's name
+    - main
