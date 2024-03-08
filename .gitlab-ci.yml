@@ -5,6 +5,8 @@ stages:
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+variables:
+  JAVA_HOME: "C:\Users\acidburn\.jdks\corretto-19.0.2"
 
 build:
   stage: build
