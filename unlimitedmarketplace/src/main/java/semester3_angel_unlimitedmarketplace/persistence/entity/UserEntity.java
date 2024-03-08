@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 
 @Entity
-@Table(name = "user") // Ensure this matches your actual table name
+@Table(name = "app_user") // Ensure this matches your actual table name
 public class UserEntity {
 
     @Id

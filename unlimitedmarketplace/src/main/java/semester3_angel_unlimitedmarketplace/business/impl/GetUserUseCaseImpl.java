@@ -2,6 +2,7 @@ package semester3_angel_unlimitedmarketplace.business.impl;
 
 import org.springframework.stereotype.Service;
 import semester3_angel_unlimitedmarketplace.business.GetUserUseCase;
+import semester3_angel_unlimitedmarketplace.business.customexceptions.UserNotFoundException;
 import semester3_angel_unlimitedmarketplace.persistence.UserRepository;
 import semester3_angel_unlimitedmarketplace.domain.GetUserResponse;
 import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
@@ -17,10 +18,14 @@ public class GetUserUseCaseImpl implements GetUserUseCase {
         this.userRepository = userRepository;
     }
 
-    @Override
-    public Optional<GetUserResponse> getUserById(Long id) {
-        UserEntity returnedUserObj = userRepository.getReferenceById(id);
-        System.out.println(returnedUserObj.getEmail());
-        return Optional.of(GetUserResponse.builder().id(returnedUserObj.getId()).username(returnedUserObj.getUserName()).email(returnedUserObj.getEmail()).build());
+    public GetUserResponse getUserById(Long id) {
+        return userRepository.findById(id)
+                .map(user -> GetUserResponse.builder()
+                        .id(user.getId())
+                        .username(user.getUserName())
+                        .email(user.getEmail())
+                        .build())
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
+
 }

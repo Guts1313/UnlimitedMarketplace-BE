@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface GetUserUseCase {
 
-    Optional<GetUserResponse> getUserById(Long id);
+    GetUserResponse getUserById(Long id);
 }

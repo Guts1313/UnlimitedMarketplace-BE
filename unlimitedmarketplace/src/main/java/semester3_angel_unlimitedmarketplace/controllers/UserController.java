@@ -4,11 +4,9 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import semester3_angel_unlimitedmarketplace.business.CreateUserUseCase;
-import semester3_angel_unlimitedmarketplace.business.GetUserUseCase;
-import semester3_angel_unlimitedmarketplace.business.GetUsersUseCase;
-import semester3_angel_unlimitedmarketplace.business.UpdateUserPasswordUseCase;
+import semester3_angel_unlimitedmarketplace.business.*;
 import semester3_angel_unlimitedmarketplace.domain.*;
 
 import java.util.Optional;
@@ -21,12 +19,12 @@ public class UserController {
     private final GetUsersUseCase getUsersUseCase;
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserPasswordUseCase updateUserPasswordUseCase;
-
+    private final DeleteUserUseCase deleteUserUseCase;
 
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUser(@PathVariable(value = "id") final Long id){
-        final Optional<GetUserResponse> responseOptional = getUserUseCase.getUserById(id);
-        return ResponseEntity.ok().body(responseOptional.get());
+        final GetUserResponse responseOptional = getUserUseCase.getUserById(id);
+        return ResponseEntity.ok().body(responseOptional);
     }
     @GetMapping
     public ResponseEntity<GetAllUsersResponse> getUsers(@RequestParam(value = "userName", required = false) String userName) {
@@ -46,6 +44,13 @@ public class UserController {
         request.setId(id);
         updateUserPasswordUseCase.updatePassword(request);
         return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("{id}")
+    @Transactional
+
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") final long id){
+        deleteUserUseCase.deleteUser(id);
+       return ResponseEntity.noContent().build();
     }
 
 }
