@@ -8,9 +8,9 @@ variables:
 
 build:
   stage: build
-  script:
-    - cd semester3\unlimitedmarketplacesemester3\unlimitedmarketplace  # Change to the directory containing your project, if necessary
-    - .\gradlew.bat build -x test  # Use .\ to specify the current directory in PowerShell
+   script:
+    - cd semester3/unlimitedmarketplace
+    - .\gradlew.bat build -x test
 
   artifacts:
     paths:
