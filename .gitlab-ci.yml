@@ -1,35 +1,39 @@
 stages:
-  - build
-  - test
-  - deploy
+  - build_and_test
+  - docker_build
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  SONAR_HOST_URL: "http://192.168.0.181:9000"
+  SONAR_LOGIN: "sqp_5b08838331b3c75e02deb42791f8c40d7081f695"
+  SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"  # Use your project key
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: "tcp://docker:2375"
 
-build:
-  stage: build
+build_and_test:
+  stage: build_and_test
+  image: gradle:latest  # Use a Docker image that has Gradle and JDK installed
   script:
-    - gradlew.bat build -x test
-  artifacts:
-    paths:
-      - build/libs/
-    expire_in: 1 hour
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace  # Change directory to where the settings.gradle file is located
+    - gradle clean build
+    - gradle test
+    - gradle sonarqube -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
+  tags:
+    - docker  # Make sure this tag matches a runner configured to use Docker
 
-test:
-  stage: test
-  image: gradle:7.3-jdk11
+docker_build:
+  stage: docker_build
+  image: docker:19.03.12
+  services:
+    - name: docker:19.03.12-dind
+      alias: docker
+      command: ["--tls=false"]
+  before_script:
+    - pwd
+    - ls -lah
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace
+    - pwd
+    - ls -lah
   script:
-    - gradle test  # Run the tests
-
-deploy_staging:
-  stage: deploy
-  image: alpine:latest  # This could be any image appropriate for your deployment
-  script:
-    - echo "Deploying to staging server..."
-    # Add your deployment scripts here, for example:
-    # - scp build/libs/myapp.jar user@staging-server:/path/to/app
-  environment:
-    name: staging
-    url: http://staging.example.com
-  only:
-    - main  # or master, depending on your default branch's name
+    - docker build -t my-application:latest -f Dockerfile .
+  tags:
+    - docker
