@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
+//comment
 public class CreateUserRequest {
 
     @NotBlank(message = "Username cannot be empty")
