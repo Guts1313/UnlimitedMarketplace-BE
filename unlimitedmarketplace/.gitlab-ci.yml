@@ -9,7 +9,6 @@ variables:
 build:
   stage: build
   script:
-    - cd semester3/unlimitedmarketplace
     - .\gradlew.bat build -x test
 
   artifacts:
