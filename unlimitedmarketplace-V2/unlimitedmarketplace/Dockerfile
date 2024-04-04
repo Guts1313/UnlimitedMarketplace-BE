@@ -11,7 +11,7 @@ RUN apt-get update && \
 # Set Gradle in the environment path
 ENV GRADLE_HOME=/opt/gradle/gradle-7.5
 ENV PATH=${GRADLE_HOME}/bin:${PATH}
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV JAVA_HOME=/usr/local/openjdk-17
 
 # Set the working directory inside the Docker image
 WORKDIR /app

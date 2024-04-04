@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8090:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/unlimitedmarketplace?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: A1312
+    depends_on:
+      - db
+  db:
+    image: mysql:8.3.0
+    environment:
+      MYSQL_DATABASE: unlimitedmarketplace
+      MYSQL_ROOT_PASSWORD: A1312
+    ports:
+      - "3390:3306"
