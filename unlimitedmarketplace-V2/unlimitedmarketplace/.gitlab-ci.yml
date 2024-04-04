@@ -3,7 +3,9 @@ stages:
   - test
   - dockerize
   - deploy
-
+before_script:
+  - apk add --no-cache --upgrade bash
+  
 variables:
   DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
 
