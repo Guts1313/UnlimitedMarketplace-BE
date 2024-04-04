@@ -1,7 +1,4 @@
-stages:
-  - test
-
-test:
-  image: alpine:latest
+test_docker:
+  stage: test
   script:
-    - echo "Testing pipdsfdseline execution"
+    - docker run hello-world
