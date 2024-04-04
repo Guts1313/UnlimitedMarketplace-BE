@@ -1,13 +1,5 @@
-build:
-  stage: build
-  image: unlimitedmarketplace_backend
+build_job:
+  tags:
+    - docker
   script:
-    - echo "Building the application..."
-    # Other build commands here
-
-test:
-  stage: test
-  image: unlimitedmarketplace_backend
-  script:
-    - echo "Running testsasdsad..."
-    # Test commands here
+    - echo "Hello, World!"
