@@ -4,18 +4,18 @@ stages:
   - deploy
 
 variables:
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_HOST: "tcp://127.0.0.1:2375"
-  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: "tcp://docker:2375
 
 build_image:
   stage: build
   image: docker:19.03.12
   services:
-    - docker:19.03.12-dind
+    - name: docker:19.03.12-dind
+      alias: docker
+      command: ["--tls=false"]
   script:
-      - docker build -t my-application:latest -f unlimitedmarketplace-V2/unlimitedmarketplace/Dockerfile .
-
+    - docker build -t my-application:latest -f unlimitedmarketplace-V2/unlimitedmarketplace/Dockerfile .
   tags:
     - docker
 
