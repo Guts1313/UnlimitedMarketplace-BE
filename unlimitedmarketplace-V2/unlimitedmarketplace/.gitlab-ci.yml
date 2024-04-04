@@ -1,8 +1,13 @@
-stages:
-  - hello
-
-hello_world:
-  stage: hello
-  image: alpine:latest
+build:
+  stage: build
+  image: unlimitedmarketplace_backend
   script:
-    - echo "Hello, Worlsasdd!"
+    - echo "Building the application..."
+    # Other build commands here
+
+test:
+  stage: test
+  image: unlimitedmarketplace_backend
+  script:
+    - echo "Running tests..."
+    # Test commands here
