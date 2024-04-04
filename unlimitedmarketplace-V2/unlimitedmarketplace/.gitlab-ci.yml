@@ -4,4 +4,4 @@ stages:
 test:
   image: alpine:latest
   script:
-    - echo "Testing pipeline execution"
+    - echo "Testing pipdsfdseline execution"
