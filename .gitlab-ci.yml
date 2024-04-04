@@ -15,7 +15,6 @@ build_image:
       alias: docker
       command: ["--tls=false"]
   before_script:
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" $CI_REGISTRY --password-stdin
   - pwd
   - ls -lah
   - cd unlimitedmarketplace-V2/unlimitedmarketplace
@@ -23,7 +22,6 @@ build_image:
   - ls -lah
   script:
    - docker build -t $CI_REGISTRY_IMAGE/my-application:latest -f Dockerfile .
-   - docker push $CI_REGISTRY_IMAGE/my-application:latest
   tags:
     - docker
 
@@ -31,9 +29,11 @@ build_image:
 
 test_application:
   stage: test
-  image: $CI_REGISTRY_IMAGE/my-application:latest
+  image: my-application:latest
   script:
     - echo "Run tests here"
+  tags:
+    - docker
 
 deploy_image:
   stage: deploy
