@@ -38,7 +38,7 @@ deploy_staging:
   stage: deploy
   image: unlimitedmarketplace_backend
   script:
-    - export JAVA_HOME="/c/Users/acidburn/.jdks/corretto-19.0.2"  # Set the JAVA_HOME variable
+    - echo $Env:JAVA_HOME = "C:\Users\acidburn\.jdks\corretto-19.0.2" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
     - echo "Deploying to staging server..."
     # Your deployment script goes here
   environment:
