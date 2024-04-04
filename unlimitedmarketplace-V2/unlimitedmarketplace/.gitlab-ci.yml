@@ -9,5 +9,5 @@ test:
   stage: test
   image: unlimitedmarketplace_backend
   script:
-    - echo "Running tests..."
+    - echo "Running testsasdsad..."
     # Test commands here
