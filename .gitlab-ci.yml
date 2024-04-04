@@ -17,7 +17,7 @@ build_image:
   before_script:
     - cd unlimitedmarketplace-V2/unlimitedmarketplace
   script:
-    - docker build -t my-application:latest .
+    - docker build -t my-application:latest -f Dockerfile unlimitedmarketplace-V2/unlimitedmarketplace
   tags:
     - docker
 
