@@ -1,5 +1,5 @@
 build_job:
   tags:
-    - docker
+    - docker  # Ensure this matches the tags of your new runner
   script:
-    - echo "Hello, World!"
+    - echo "Building with Docker..."
