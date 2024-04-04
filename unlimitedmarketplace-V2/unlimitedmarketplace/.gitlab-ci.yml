@@ -1,6 +1,4 @@
-build_job:
-  image: openjdk:11
+test_minimal_job:
+  image: debian:latest
   script:
-    - echo $JAVA_HOME
-    - javac MyApplication.java
-    - java MyApplication
+    - echo "This is a test job."
