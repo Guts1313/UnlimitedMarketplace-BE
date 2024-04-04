@@ -42,6 +42,6 @@ deploy_staging:
     # Your deployment script goes here
   environment:
     name: staging
-    url: http://staging.example.com
+    url: http://stagging.example.com
   only:
     - main
