@@ -10,11 +10,13 @@ variables:
 build:
   stage: build
   script:
+    - 'if [ -z "$CI_COMMIT_REF_NAME" ]; then export JAVA_HOME="C:\\Users\\acidburn\\.jdks\\corretto-19.0.2"; fi'  # Adjust condition as needed
     - .\gradlew.bat build -x test
   artifacts:
     paths:
       - build/libs/
     expire_in: 1 hour
+
 
 test:
   stage: test
