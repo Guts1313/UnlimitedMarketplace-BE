@@ -9,9 +9,11 @@ build_image:
   services:
     - docker:19.03.12-dind
   script:
-    - docker build -t my-application:latest ./unlimitedmarketplace-V2/unlimitedmarketplace
+      - docker build -t my-application:latest -f unlimitedmarketplace-V2/unlimitedmarketplace/Dockerfile .
+
   tags:
     - docker
+
 
 
 test_application:
