@@ -9,7 +9,7 @@ build_image:
   services:
     - docker:19.03.12-dind
   script:
-    - docker build -t my-application ./unlimitedmarketplace-V2/unlimitedmarketplace .
+    - docker build -t my-application ./unlimitedmarketplace-V2/unlimitedmarketplace
   tags:
     - docker
 
