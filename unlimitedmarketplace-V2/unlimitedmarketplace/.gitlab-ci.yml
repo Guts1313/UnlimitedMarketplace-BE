@@ -1,7 +1,23 @@
-build_application:
-  image: docker:19.03.12
-  variables:
-    JAVA_HOME: "/usr/lib/jvm/java-11-openjdk-amd64" # Example path, adjust as needed
+variables:
+  DOCKER_DRIVER: overlay2
+  # Define the Docker version you want to use
+  DOCKER_VERSION: 19.03.12
+
+# This service is necessary for Docker-in-Docker to work.
+services:
+  - docker:dind
+
+build:
+  image: docker:${DOCKER_VERSION}
+  stage: build
   script:
-    - echo $JAVA_HOME # This is just to demonstrate that JAVA_HOME is set
-    - ./gradlew build # Example build command
+    - docker info
+    # Login to DockerHub or another Docker registry
+    # - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    # Build and push a Docker image, for example
+    - docker build -t my-image-name .
+    # - docker push my-image-name
+  # Define where the Docker daemon host socket is located
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
