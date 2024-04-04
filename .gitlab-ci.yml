@@ -21,7 +21,7 @@ build_image:
   - pwd
   - ls -lah
   script:
-    - docker build -t my-application:latest -f Dockerfile unlimitedmarketplace-V2/unlimitedmarketplace
+  - docker build -t my-application:latest -f Dockerfile .
   tags:
     - docker
 
