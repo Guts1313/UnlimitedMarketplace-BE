@@ -5,4 +5,4 @@ hello_world:
   stage: hello
   image: alpine:latest
   script:
-    - echo "Hello, Worlsd!"
+    - echo "Hello, Worlsasdd!"
