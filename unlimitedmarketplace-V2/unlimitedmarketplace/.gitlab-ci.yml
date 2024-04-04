@@ -1,4 +1,17 @@
-test_docker:
+stages:
+  - build
+  - test
+
+build_application:
+  stage: build
+  script:
+    - docker build -t my-application .
+  only:
+    - branches
+
+test_application:
   stage: test
   script:
-    - docker run hello-world
+    - docker run --rm my-application
+  only:
+    - branches
