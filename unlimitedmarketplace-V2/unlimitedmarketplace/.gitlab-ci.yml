@@ -1,16 +1,16 @@
 stages:
   - build
   - test
+  - dockerize
   - deploy
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
 
 build:
   stage: build
   script:
     - .\gradlew.bat build -x test
-
   artifacts:
     paths:
       - build/libs/
@@ -22,15 +22,26 @@ test:
   script:
     - gradle test  # Run the tests
 
+dockerize:
+  stage: dockerize
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $DOCKER_IMAGE_NAME .
+    - docker push $DOCKER_IMAGE_NAME
+  only:
+    - main
+
 deploy_staging:
   stage: deploy
-  image: alpine:latest  # This could be any image appropriate for your deployment
+  image: alpine:latest
   script:
     - echo "Deploying to staging server..."
-    # Add your deployment scripts here, for example:
-    # - scp build/libs/myapp.jar user@staging-server:/path/to/app
+    # Your deployment script goes here
   environment:
     name: staging
     url: http://staging.example.com
   only:
-    - main  # or master, depending on your default branch's name
+    - main
