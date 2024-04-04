@@ -15,7 +15,11 @@ build_image:
       alias: docker
       command: ["--tls=false"]
   before_script:
-    - cd unlimitedmarketplace-V2/unlimitedmarketplace
+  - pwd
+  - ls -lah
+  - cd unlimitedmarketplace-V2/unlimitedmarketplace
+  - pwd
+  - ls -lah
   script:
     - docker build -t my-application:latest -f Dockerfile unlimitedmarketplace-V2/unlimitedmarketplace
   tags:
