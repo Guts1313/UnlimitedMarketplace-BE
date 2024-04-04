@@ -1,23 +1,6 @@
-variables:
-  DOCKER_DRIVER: overlay2
-  # Define the Docker version you want to use
-  DOCKER_VERSION: 19.03.12
-
-# This service is necessary for Docker-in-Docker to work.
-services:
-  - docker:dind
-
-build:
-  image: docker:${DOCKER_VERSION}
-  stage: build
+build_job:
+  image: openjdk:11
   script:
-    - docker info
-    # Login to DockerHub or another Docker registry
-    # - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-    # Build and push a Docker image, for example
-    - docker build -t my-image-name .
-    # - docker push my-image-name
-  # Define where the Docker daemon host socket is located
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    - echo $JAVA_HOME
+    - javac MyApplication.java
+    - java MyApplication
