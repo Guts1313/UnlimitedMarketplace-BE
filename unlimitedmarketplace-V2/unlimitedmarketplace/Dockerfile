@@ -1,10 +1,6 @@
 # Stage 1: Build the application with Java 17 JDK
 FROM openjdk:17-jdk-slim as builder
 
-COPY --from=builder /app/build/libs/unlimitedmarketplace-0.0.1-SNAPSHOT-plain.jar /app/app.jar
-
-EXPOSE 8080
-
 # Install necessary packages to download and unzip Gradle
 RUN apt-get update && \
     apt-get install -y wget unzip && \
@@ -32,7 +28,8 @@ RUN gradle build -x test
 FROM openjdk:17-jdk-slim
 
 # Copy the built application jar from the build stage to the current stage
-COPY --from=builder /app/build/libs/*.jar /app/
+# Make sure the path to the JAR file is correct, and use the actual JAR file name
+COPY --from=builder /app/build/libs/unlimitedmarketplace-0.0.1-SNAPSHOT-plain.jar /app/app.jar
 
 # Expose the application port
 EXPOSE 8080
