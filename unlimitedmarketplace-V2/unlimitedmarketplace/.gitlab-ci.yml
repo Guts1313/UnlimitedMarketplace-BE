@@ -7,16 +7,39 @@ stages:
 variables:
   DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
 
-build:
+# This is a template for all build jobs
+.build_template: &build_definition
+  script:
+    - echo "Placeholder for build commands"
+
+# Build stage for Windows-specific runner, if needed
+build_windows:
   stage: build
   script:
-    - 'if [ -z "$CI_COMMIT_REF_NAME" ]; then export JAVA_HOME="C:\\Users\\acidburn\\.jdks\\corretto-19.0.2"; fi'  # Adjust condition as needed
+    # This assumes you have specific requirements to run gradlew.bat on a Windows runner
+    - 'if [ -n "$CI_JOB_TOKEN" ]; then export JAVA_HOME="C:\\Users\\acidburn\\.jdks\\corretto-19.0.2"; fi'  # Adjust the condition as needed
     - .\gradlew.bat build -x test
   artifacts:
     paths:
       - build/libs/
     expire_in: 1 hour
+  tags:
+    - windows  # Ensure your Windows runner has this tag
+  only:
+    - branches
 
+# Build stage for Docker/Linux environments
+build:
+  stage: build
+  image: docker:19.03.12
+  script:
+    - docker run --rm -v $(pwd):/app -w /app gradle:7.3-jdk11 gradle build -x test
+  artifacts:
+    paths:
+      - build/libs/
+    expire_in: 1 hour
+  except:
+    - branches  # This ensures that this job does not run on branch pushes if you're using a Windows-specific job for those.
 
 test:
   stage: test
@@ -44,6 +67,6 @@ deploy_staging:
     # Your deployment script goes here
   environment:
     name: staging
-    url: http://stagging.example.com
+    url: http://staging.example.com
   only:
     - main
