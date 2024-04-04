@@ -1,5 +1,9 @@
-build_job:
+stages:
+  - test
+
+test_job:
+  stage: test
   tags:
-    - docker  # Ensure this matches the tags of your new runner
+    - docker
   script:
-    - echo "Building with Docker..."
+    - echo "Testing Runnerasdasd"."
