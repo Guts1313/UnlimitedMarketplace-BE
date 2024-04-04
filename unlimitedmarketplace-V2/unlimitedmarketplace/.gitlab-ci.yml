@@ -1,4 +1,0 @@
-test_minimal_job:
-  image: debian:latest
-  script:
-    - echo "This is a test job."
