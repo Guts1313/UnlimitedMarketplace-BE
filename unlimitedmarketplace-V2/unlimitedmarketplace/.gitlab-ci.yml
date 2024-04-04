@@ -1,17 +1,7 @@
-stages:
-  - build
-  - test
-
 build_application:
-  stage: build
+  image: docker:19.03.12
+  variables:
+    JAVA_HOME: "/usr/lib/jvm/java-11-openjdk-amd64" # Example path, adjust as needed
   script:
-    - docker build -t my-application .
-  only:
-    - branches
-
-test_application:
-  stage: test
-  script:
-    - docker run --rm my-application
-  only:
-    - branches
+    - echo $JAVA_HOME # This is just to demonstrate that JAVA_HOME is set
+    - ./gradlew build # Example build command
