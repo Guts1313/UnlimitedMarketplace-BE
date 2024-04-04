@@ -36,8 +36,9 @@ dockerize:
 
 deploy_staging:
   stage: deploy
-  image: alpine:latest
+  image: unlimitedmarketplace_backend
   script:
+    - export JAVA_HOME="C:\Users\acidburn\.jdks\corretto-19.0.2"  # Set the JAVA_HOME variable
     - echo "Deploying to staging server..."
     # Your deployment script goes here
   environment:
