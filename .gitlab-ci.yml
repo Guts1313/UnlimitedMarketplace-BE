@@ -1,4 +1,34 @@
-test_minimal_job:
-  image: debian:latest
+stages:
+  - build
+  - test
+  - deploy
+
+build_image:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
   script:
-    - echo "This is a test job."
+    - docker build -t my-application .
+  tags:
+    - docker
+
+test_application:
+  stage: test
+  image: my-application:latest
+  script:
+    - echo "Run tests here"
+  tags:
+    - docker
+
+deploy_image:
+  stage: deploy
+  image: docker:19.03.12
+  script:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - docker tag my-application:latest $DOCKER_USERNAME/my-application:latest
+    - docker push $DOCKER_USERNAME/my-application:latest
+  only:
+    - main
+  tags:
+    - docker
