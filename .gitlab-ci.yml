@@ -14,8 +14,10 @@ build_image:
     - name: docker:19.03.12-dind
       alias: docker
       command: ["--tls=false"]
+  before_script:
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace
   script:
-    - docker build -t my-application:latest -f unlimitedmarketplace-V2/unlimitedmarketplace/Dockerfile .
+    - docker build -t my-application:latest .
   tags:
     - docker
 
