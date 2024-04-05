@@ -1,4 +1,4 @@
-package semester3_angel_unlimitedmarketplace;
+package semester3_angel_unlimitedmarketplace.repositories;
 
 
 import org.junit.jupiter.api.Test;

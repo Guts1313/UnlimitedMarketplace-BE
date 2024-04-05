@@ -1,4 +1,4 @@
-package semester3_angel_unlimitedmarketplace;
+package semester3_angel_unlimitedmarketplace.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
