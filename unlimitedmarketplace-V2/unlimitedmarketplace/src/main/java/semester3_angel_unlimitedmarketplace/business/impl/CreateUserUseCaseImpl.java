@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import semester3_angel_unlimitedmarketplace.business.CreateUserUseCase;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateEmailException;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateUsernameException;
+import semester3_angel_unlimitedmarketplace.domain.UserRoles;
 import semester3_angel_unlimitedmarketplace.persistence.UserRepository;
 import semester3_angel_unlimitedmarketplace.domain.CreateUserRequest;
 import semester3_angel_unlimitedmarketplace.domain.CreateUserResponse;
@@ -38,10 +39,11 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
         userEntity.setUserName(request.getUserName());
         userEntity.setPasswordHash(passwordEncoder.encode(request.getPasswordHash())); // Hashing the password
         userEntity.setEmail(request.getEmail());
+        userEntity.setUserRole(UserRoles.USER);
         UserEntity savedUser = userRepository.save(userEntity);
 
         // Return a response object
-        return new CreateUserResponse(savedUser.getId(), savedUser.getUserName(), savedUser.getEmail());
+        return new CreateUserResponse(savedUser.getId(), savedUser.getUserName(), savedUser.getEmail(),savedUser.getUserRole(savedUser.getId()));
     }
 
 }

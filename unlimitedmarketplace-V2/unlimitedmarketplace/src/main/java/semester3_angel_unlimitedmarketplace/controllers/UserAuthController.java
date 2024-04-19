@@ -15,7 +15,6 @@ import semester3_angel_unlimitedmarketplace.util.JwtUtil;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000") // Replace with your React application's URL
-
 @RequestMapping("/unlimitedmarketplace/auth")
 public class UserAuthController {
 

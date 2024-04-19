@@ -12,6 +12,6 @@ public class CreateUserResponse {
     private Long id;
     private final String userName;
     private final String email;
-
+    private final UserRoles role;
 
 }

@@ -2,6 +2,7 @@ package semester3_angel_unlimitedmarketplace.persistence.entity;
 
 
 import jakarta.persistence.*;
+import semester3_angel_unlimitedmarketplace.domain.UserRoles;
 
 
 @Entity
@@ -20,6 +21,9 @@ public class UserEntity {
 
     @Column(unique = true,name = "email")
     private String email;
+
+    @Column(unique = false,name = "role")
+    private UserRoles role;
 
     // Standard getters and setters
     public Long getId() {
@@ -53,4 +57,7 @@ public class UserEntity {
     public void setEmail(String email) {
         this.email = email;
     }
+    public void setUserRole(UserRoles role){this.role = role;}
+    public UserRoles getUserRole(Long id){return role;}
+
 }

@@ -1,5 +1,6 @@
 package semester3_angel_unlimitedmarketplace.controllers;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,13 @@ public class UserController {
     private final UpdateUserPasswordUseCase updateUserPasswordUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
 
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUser(@PathVariable(value = "id") final Long id){
         final GetUserResponse responseOptional = getUserUseCase.getUserById(id);
         return ResponseEntity.ok().body(responseOptional);
     }
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @GetMapping
     public ResponseEntity<GetAllUsersResponse> getUsers(@RequestParam(value = "userName", required = false) String userName) {
         GetAllUsersRequest request = GetAllUsersRequest.builder().userName(userName).build();
@@ -33,12 +36,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
-
     @PostMapping
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request){
         CreateUserResponse response = createUserUseCase.saveUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @PutMapping("{id}")
     public ResponseEntity<Void> updateUser(@PathVariable("id") long id,
                                            @RequestBody @Valid UpdateUserPasswordRequest request){
@@ -47,6 +51,7 @@ public class UserController {
         updateUserPasswordUseCase.updatePassword(request);
         return ResponseEntity.noContent().build();
     }
+    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @DeleteMapping("{id}")
     @Transactional
 
