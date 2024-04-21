@@ -62,8 +62,6 @@ build_and_test:
     - gradle clean build
     - gradle test
     - gradle sonarqube -Dsonar.projectKey=ProjectKey -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
-  tags:
-    - shell
 
 docker_build:
   stage: docker_build
@@ -74,5 +72,4 @@ docker_build:
     - docker info
   script:
     - docker build -t unlimitedmarketplace_backend:latest .
-  tags:
-    - shell
+ 
