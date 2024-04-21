@@ -46,6 +46,7 @@
 #    - main
 #  tags:
 #    - docker
+#
 stages:
   - build_and_test
   - docker_build
