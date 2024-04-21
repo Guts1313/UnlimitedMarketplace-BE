@@ -46,7 +46,7 @@
 #    - main
 #  tags:
 #    - docker
-#
+
 stages:
   - build_and_test
   - docker_build
@@ -58,6 +58,8 @@ variables:
 
 build_and_test:
   stage: build_and_test
+  tags:
+    - shell  # Make sure this tag matches the tag of your shell runner
   script:
     - 'C:\Gradle\gradle-8.7\bin\gradle' clean build
     - 'C:\Gradle\gradle-8.7\bin\gradle' test
@@ -65,6 +67,8 @@ build_and_test:
 
 docker_build:
   stage: docker_build
+  tags:
+    - docker  # Ensure this matches your Docker runner's tag
   image: docker:19.03.12
   services:
     - docker:19.03.12-dind
@@ -72,4 +76,3 @@ docker_build:
     - docker info
   script:
     - docker build -t unlimitedmarketplace_backend:latest .
- 
