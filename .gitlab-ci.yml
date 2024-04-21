@@ -3,7 +3,7 @@ stages:
   - docker_build
 
 variables:
-  SONAR_HOST_URL: "localhost:9000/"
+  SONAR_HOST_URL: "http://192.168.0.181:9000"
   SONAR_LOGIN: "sqp_5b08838331b3c75e02deb42791f8c40d7081f695"
   SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"  # Use your project key
 
