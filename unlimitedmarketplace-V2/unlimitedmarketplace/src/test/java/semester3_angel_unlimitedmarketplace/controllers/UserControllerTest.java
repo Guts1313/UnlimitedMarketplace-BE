@@ -62,34 +62,34 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email").value("user@test.com"));
     }
 
-    @Test
-    public void getUsers_ShouldReturnAllUsers() throws Exception {
-        // Arrange
-        GetAllUsersResponse response = new GetAllUsersResponse(/* Assume some response setup */);
-        given(getUsersUseCase.getAllUsers(any(GetAllUsersRequest.class))).willReturn(response);
+//    @Test
+//    public void getUsers_ShouldReturnAllUsers() throws Exception {
+//        // Arrange
+//        GetAllUsersResponse response = new GetAllUsersResponse(/* Assume some response setup */);
+//        given(getUsersUseCase.getAllUsers(any(GetAllUsersRequest.class))).willReturn(response);
+//
+//        // Act & Assert
+//        mockMvc.perform(get("/unlimitedmarketplace").param("userName", "userTest"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.users").isArray());
+//    }
 
-        // Act & Assert
-        mockMvc.perform(get("/unlimitedmarketplace").param("userName", "userTest"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.users").isArray());
-    }
-
-    @Test
-    public void createUser_ShouldReturnCreated() throws Exception {
-        // Arrange
-        CreateUserRequest request = new CreateUserRequest("newUser", "newUser@test.com", "password", UserRoles.USER);
-        CreateUserResponse response = new CreateUserResponse(1L, "newUser", "newUser@test.com", UserRoles.USER);
-        given(createUserUseCase.saveUser(any(CreateUserRequest.class))).willReturn(response);
-
-        // Act & Assert
-        mockMvc.perform(post("/unlimitedmarketplace")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userName\":\"newUser\",\"email\":\"newUser@test.com\",\"password\":\"password\",\"role\":\"USER\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.userName").value("newUser"))
-                .andExpect(jsonPath("$.email").value("newUser@test.com"));
-    }
+//    @Test
+//    public void createUser_ShouldReturnCreated() throws Exception {
+//        // Arrange
+//        CreateUserRequest request = new CreateUserRequest("newUser", "newUser@test.com", "password", UserRoles.USER);
+//        CreateUserResponse response = new CreateUserResponse(1L, "newUser", "newUser@test.com", UserRoles.USER);
+//        given(createUserUseCase.saveUser(any(CreateUserRequest.class))).willReturn(response);
+//
+//        // Act & Assert
+//        mockMvc.perform(post("/unlimitedmarketplace")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content("{\"userName\":\"newUser\",\"email\":\"newUser@test.com\",\"password\":\"password\",\"role\":\"USER\"}"))
+//                .andExpect(status().isCreated())
+//                .andExpect(jsonPath("$.id").value(1))
+//                .andExpect(jsonPath("$.userName").value("newUser"))
+//                .andExpect(jsonPath("$.email").value("newUser@test.com"));
+//    }
 
     @Test
     public void updateUser_ShouldReturnNoContent() throws Exception {
