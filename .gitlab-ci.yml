@@ -16,7 +16,7 @@ build_and_test:
     - cd unlimitedmarketplace-V2/unlimitedmarketplace  # Change directory to where the settings.gradle file is located
     - gradle clean build
     - gradle test
-    - gradle sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
+    - gradle sonarqube -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
   tags:
     - docker  # Make sure this tag matches a runner configured to use Docker
 
@@ -26,16 +26,14 @@ docker_build:
   services:
     - name: docker:19.03.12-dind
       alias: docker
-      command: [ "--tls=false" ]
-    before_script:
-      - pwd
-      - ls -lah
-      - cd unlimitedmarketplace-V2/unlimitedmarketplace
-      - pwd
-      - ls -lah
-    script:
-      - docker build -t my-application:latest -f Dockerfile .
-    tags:
-      - docker
-
-
+      command: ["--tls=false"]
+  before_script:
+    - pwd
+    - ls -lah
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace
+    - pwd
+    - ls -lah
+  script:
+    - docker build -t my-application:latest -f Dockerfile .
+  tags:
+    - docker
