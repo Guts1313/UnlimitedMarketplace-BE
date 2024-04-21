@@ -89,6 +89,7 @@ public class UserControllerTest {
 //                .andExpect(jsonPath("$.id").value(1))
 //                .andExpect(jsonPath("$.userName").value("newUser"))
 //                .andExpect(jsonPath("$.email").value("newUser@test.com"));
+//
 //    }
 
     @Test
