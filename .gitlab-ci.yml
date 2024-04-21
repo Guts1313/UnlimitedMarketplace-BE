@@ -6,6 +6,8 @@ variables:
   SONAR_HOST_URL: "http://192.168.0.181:9000"
   SONAR_LOGIN: "sqp_5b08838331b3c75e02deb42791f8c40d7081f695"
   SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"  # Use your project key
+  DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: "tcp://docker:2375"
 
 build_and_test:
   stage: build_and_test
@@ -23,9 +25,17 @@ docker_build:
   image: docker:19.03.12
   services:
     - name: docker:19.03.12-dind
-  before_script:
-    - docker info
-  script:
-    - cd unlimitedmarketplace-V2/unlimitedmarketplace  # Ensure you're in the right directory to access the Dockerfile
-    - docker build -t unlimitedmarketplace_backend:latest .
+      alias: docker
+      command: [ "--tls=false" ]
+    before_script:
+      - pwd
+      - ls -lah
+      - cd unlimitedmarketplace-V2/unlimitedmarketplace
+      - pwd
+      - ls -lah
+    script:
+      - docker build -t my-application:latest -f Dockerfile .
+    tags:
+      - docker
+
 
