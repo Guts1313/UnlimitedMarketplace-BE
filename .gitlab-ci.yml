@@ -10,6 +10,7 @@ build_and_test:
   stage: build_and_test
   image: gradle:latest  # Use a Docker image that has Gradle and JDK installed
   script:
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace  # Change directory to where the settings.gradle file is located
     - gradle clean build
     - gradle test
     - gradle sonarqube -Dsonar.projectKey=ProjectKey -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
@@ -24,5 +25,6 @@ docker_build:
   before_script:
     - docker info
   script:
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace  # Ensure you're in the right directory to access the Dockerfile
     - docker build -t unlimitedmarketplace_backend:latest .
 
