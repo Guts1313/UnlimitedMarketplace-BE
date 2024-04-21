@@ -58,8 +58,6 @@ variables:
 
 build_and_test:
   stage: build_and_test
-  tags:
-    - shell  # Ensure this tag matches your shell runner
   script:
     - 'C:\Gradle\gradle-8.7\bin\gradle' clean build
     - 'C:\Gradle\gradle-8.7\bin\gradle' test
