@@ -1,40 +1,28 @@
 stages:
-  - build
-  - test
-  - deploy
+  - build_and_test
+  - docker_build
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  SONAR_HOST_URL: "http://localhost:9000"
+  SONAR_LOGIN: "sqp_5b08838331b3c75e02deb42791f8c40d7081f695"
 
-before_script:
-  # Assuming Java is installed at this path; change it to your Java installation path if different
-  - $Env:JAVA_HOME = "C:\Users\acidburn\.jdks\corretto-19.0.2"
-  - $Env:PATH = "$Env:JAVA_HOME\bin;$Env:PATH"
-
-build:
-  stage: build
+build_and_test:
+  stage: build_and_test
+  tags:
+    - shell  # Make sure this tag matches the tag of your shell runner
   script:
-    - cd unlimitedmarketplace
-    - .\gradlew.bat build -x test  # Notice the change to PowerShell-friendly call
+    - 'C:\Gradle\gradle-8.7\bin\gradle' clean build
+    - 'C:\Gradle\gradle-8.7\bin\gradle' test
+    - 'C:\Gradle\gradle-8.7\bin\gradle' sonarqube -Dsonar.projectKey=ProjectKey -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
 
-  artifacts:
-    paths:
-      - build/libs/
-    expire_in: 1 hour
-
-test:
-  stage: test
+docker_build:
+  stage: docker_build
+  tags:
+    - docker  # Ensure this matches your Docker runner's tag
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  before_script:
+    - docker info
   script:
-    - cd unlimitedmarketplace
-    - .\gradlew.bat test  # Again, adjusted for PowerShell
-
-deploy_staging:
-  stage: deploy
-  script:
-    - echo "Deploying to staging server..."
-    # Add your Windows-specific deployment scripts here
-  environment:
-    name: staging
-    url: http://staging.example.com
-  only:
-    - main
+    - docker build -t unlimitedmarketplace_backend:latest .
