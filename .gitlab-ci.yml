@@ -15,8 +15,6 @@ build_and_test:
 
 docker_build:
   stage: docker_build
-  tags:
-    - docker  # Ensure this matches your Docker runner's tag
   image: docker:19.03.12
   services:
     - name: docker:19.03.12-dind
