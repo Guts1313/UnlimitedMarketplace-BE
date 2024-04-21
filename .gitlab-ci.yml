@@ -8,10 +8,13 @@ variables:
 
 build_and_test:
   stage: build_and_test
+  image: gradle:latest  # Use a Docker image that has Gradle and JDK installed
   script:
-    - '"C:\\Gradle\\gradle-8.7\\bin\\gradle" clean build'
-    - '"C:\\Gradle\\gradle-8.7\\bin\\gradle" test'
-    - '"C:\\Gradle\\gradle-8.7\\bin\\gradle" sonarqube -Dsonar.projectKey=ProjectKey -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN'
+    - gradle clean build
+    - gradle test
+    - gradle sonarqube -Dsonar.projectKey=ProjectKey -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
+  tags:
+    - docker  # Make sure this tag matches a runner configured to use Docker
 
 docker_build:
   stage: docker_build
@@ -22,3 +25,4 @@ docker_build:
     - docker info
   script:
     - docker build -t unlimitedmarketplace_backend:latest .
+
