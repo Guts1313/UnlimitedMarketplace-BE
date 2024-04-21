@@ -32,7 +32,7 @@ public class UserAuthController {
     @PostMapping("/login")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with your React application's URL
 
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),

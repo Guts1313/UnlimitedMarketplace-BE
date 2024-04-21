@@ -1,48 +1,78 @@
+#stages:
+#  - build
+#  - test
+#  - deploy
+#
+#variables:
+#  DOCKER_TLS_CERTDIR: ""
+#  DOCKER_HOST: "tcp://docker:2375"
+#
+#build_image:
+#  stage: build
+#  image: docker:19.03.12
+#  services:
+#    - name: docker:19.03.12-dind
+#      alias: docker
+#      command: ["--tls=false"]
+#  before_script:
+#  - pwd
+#  - ls -lah
+#  - cd unlimitedmarketplace-V2/unlimitedmarketplace
+#  - pwd
+#  - ls -lah
+#  script:
+#  - docker build -t my-application:latest -f Dockerfile .
+#  tags:
+#    - docker
+#
+#
+#
+#test_application:
+#  stage: test
+#  image: my-application:latest
+#  script:
+#    - echo "Run tests here"
+#  tags:
+#    - docker
+#
+#deploy_image:
+#  stage: deploy
+#  image: docker:19.03.12
+#  script:
+#    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+#    - docker tag my-application:latest $DOCKER_USERNAME/my-application:latest
+#    - docker push $DOCKER_USERNAME/my-application:latest
+#  only:
+#    - main
+#  tags:
+#    - docker
 stages:
-  - build
-  - test
+  - build_and_test
+  - docker_build
   - deploy
 
 variables:
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: "tcp://docker:2375"
+  SONAR_HOST_URL: "http://localhost:9000"
+  SONAR_LOGIN: "sqp_5b08838331b3c75e02deb42791f8c40d7081f695"
 
-build_image:
-  stage: build
+build_and_test:
+  stage: build_and_test
+  image: gradle:jdk11
+  script:
+    - gradle clean build
+    - gradle test
+    - gradle sonarqube -Dsonar.projectKey=ProjectKey -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
+  tags:
+    - shell
+
+docker_build:
+  stage: docker_build
   image: docker:19.03.12
   services:
-    - name: docker:19.03.12-dind
-      alias: docker
-      command: ["--tls=false"]
+    - docker:19.03.12-dind
   before_script:
-  - pwd
-  - ls -lah
-  - cd unlimitedmarketplace-V2/unlimitedmarketplace
-  - pwd
-  - ls -lah
+    - docker info
   script:
-  - docker build -t my-application:latest -f Dockerfile .
+    - docker build -t unlimitedmarketplace_backend:latest .
   tags:
-    - docker
-
-
-
-test_application:
-  stage: test
-  image: my-application:latest
-  script:
-    - echo "Run tests here"
-  tags:
-    - docker
-
-deploy_image:
-  stage: deploy
-  image: docker:19.03.12
-  script:
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - docker tag my-application:latest $DOCKER_USERNAME/my-application:latest
-    - docker push $DOCKER_USERNAME/my-application:latest
-  only:
-    - main
-  tags:
-    - docker
+    - shell

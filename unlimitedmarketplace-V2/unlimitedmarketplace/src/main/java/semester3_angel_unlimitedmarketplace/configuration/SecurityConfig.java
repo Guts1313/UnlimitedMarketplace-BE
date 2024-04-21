@@ -49,6 +49,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private static final String LOGIN = "/login";  // Compliant
 
     public SecurityConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -93,12 +94,12 @@ public class SecurityConfig {
             request.requestMatchers(
                     "/api/v*/registration/**",
                     "/register*",
-                    "/login",
+                    LOGIN,
                     "/unlimitedmarketplace/**",
                     "/actuator/**").permitAll();
             request.anyRequest().permitAll();
         });
-        http.formLogin(fL -> fL.loginPage("/login")
+        http.formLogin(fL -> fL.loginPage(LOGIN)
                 .usernameParameter("email").permitAll()
                 .defaultSuccessUrl("/", true)
                 .failureUrl("/login-error"));
@@ -106,7 +107,7 @@ public class SecurityConfig {
                 .clearAuthentication(true)
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "Idea-2e8e7cee")
-                .logoutSuccessUrl("/login"));
+                .logoutSuccessUrl(LOGIN));
 
         return http.build();
 

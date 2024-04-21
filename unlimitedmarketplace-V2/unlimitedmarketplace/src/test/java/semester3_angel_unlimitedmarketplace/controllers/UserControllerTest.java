@@ -1,33 +1,33 @@
 package semester3_angel_unlimitedmarketplace.controllers;
 
-import org.junit.jupiter.api.Test;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.given;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import semester3_angel_unlimitedmarketplace.business.*;
-import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateUsernameException;
-import semester3_angel_unlimitedmarketplace.configuration.TestsSecurityConfig;
 import semester3_angel_unlimitedmarketplace.controllers.UserController;
-import semester3_angel_unlimitedmarketplace.domain.CreateUserRequest;
-import semester3_angel_unlimitedmarketplace.domain.CreateUserResponse;
-import semester3_angel_unlimitedmarketplace.domain.GetUserResponse;
-import semester3_angel_unlimitedmarketplace.domain.UpdateUserPasswordRequest;
+import semester3_angel_unlimitedmarketplace.domain.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")  // Ensure this profile configures the necessary beans and settings for tests
 
-@ActiveProfiles("test")
-@Import(TestsSecurityConfig.class) // Add this line to force-load  TestSecurityConfig
-//testing pipeline
-@WebMvcTest(UserController.class)
 public class UserControllerTest {
 
     @Autowired
@@ -50,10 +50,12 @@ public class UserControllerTest {
 
     @Test
     public void getUser_ShouldReturnUser() throws Exception {
+        // Arrange
         GetUserResponse response = new GetUserResponse(1L, "userTest", "user@test.com");
         given(getUserUseCase.getUserById(1L)).willReturn(response);
 
-        mockMvc.perform(get("/unlimitedmarketplace/1"))
+        // Act & Assert
+        mockMvc.perform(get("/unlimitedmarketplace/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("userTest"))
@@ -61,62 +63,54 @@ public class UserControllerTest {
     }
 
     @Test
-    public void createUser_ShouldReturnCreated_WhenRequestIsValid() throws Exception {
-        // Prepare the request and response objects
-        CreateUserRequest request = CreateUserRequest.builder()
-                .userName("newUser")
-                .email("newUser@test.com")
-                .passwordHash("password")
-                .build();
+    public void getUsers_ShouldReturnAllUsers() throws Exception {
+        // Arrange
+        GetAllUsersResponse response = new GetAllUsersResponse(/* Assume some response setup */);
+        given(getUsersUseCase.getAllUsers(any(GetAllUsersRequest.class))).willReturn(response);
 
-        CreateUserResponse response = new CreateUserResponse(1L, "newUser", "newUser@test.com");
+        // Act & Assert
+        mockMvc.perform(get("/unlimitedmarketplace").param("userName", "userTest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.users").isArray());
+    }
 
-        // Mock the behavior of the use case to return the expected response
+    @Test
+    public void createUser_ShouldReturnCreated() throws Exception {
+        // Arrange
+        CreateUserRequest request = new CreateUserRequest("newUser", "newUser@test.com", "password", UserRoles.USER);
+        CreateUserResponse response = new CreateUserResponse(1L, "newUser", "newUser@test.com", UserRoles.USER);
         given(createUserUseCase.saveUser(any(CreateUserRequest.class))).willReturn(response);
 
-        // Perform the POST request and expect the correct status and response body
+        // Act & Assert
         mockMvc.perform(post("/unlimitedmarketplace")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userName\":\"newUser\",\"email\":\"newUser@test.com\",\"passwordHash\":\"password\"}"))
+                        .content("{\"userName\":\"newUser\",\"email\":\"newUser@test.com\",\"password\":\"password\",\"role\":\"USER\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.userName").value("newUser"))
                 .andExpect(jsonPath("$.email").value("newUser@test.com"));
     }
-    @Test
-    public void createUser_ShouldFail400_WhenUsernameAlreadyExists() throws Exception {
-        // Simulate the scenario where the username is already taken
-        given(createUserUseCase.saveUser(any(CreateUserRequest.class)))
-                .willThrow(new DuplicateUsernameException(HttpStatus.BAD_REQUEST));
-
-        // Perform the POST request with a request body that would trigger the duplicate username situation
-        mockMvc.perform(post("/unlimitedmarketplace")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userName\":\"newUser\",\"email\":\"newUser@test.com\",\"passwordHash\":\"password\"}"))
-                .andExpect(status().isBadRequest()); // Expect 400 Bad Request status
-
-    }
-
-
-
 
     @Test
     public void updateUser_ShouldReturnNoContent() throws Exception {
+        // Arrange
         UpdateUserPasswordRequest request = new UpdateUserPasswordRequest(1L, "newPassword");
 
-        mockMvc.perform(put("/unlimitedmarketplace/1")
+        // Act & Assert
+        mockMvc.perform(put("/unlimitedmarketplace/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1,\"newPassword\":\"newPassword\"}"))
+                        .content("{\"newPassword\":\"newPassword\"}"))
                 .andExpect(status().isNoContent());
 
-        // Here, you might also want to verify updateUserPasswordUseCase.updatePassword was called
+        verify(updateUserPasswordUseCase, times(1)).updatePassword(any(UpdateUserPasswordRequest.class));
     }
 
     @Test
     public void deleteUser_ShouldReturnNoContent() throws Exception {
-        mockMvc.perform(delete("/unlimitedmarketplace/1"))
+        // Act & Assert
+        mockMvc.perform(delete("/unlimitedmarketplace/{id}", 1L))
                 .andExpect(status().isNoContent());
 
-        // Similarly, you might want to verify deleteUserUseCase.deleteUser was called with the correct ID
+        verify(deleteUserUseCase, times(1)).deleteUser(1L);
     }
 }

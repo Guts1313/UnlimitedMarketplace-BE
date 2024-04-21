@@ -24,4 +24,6 @@ public class CreateUserRequest {
     @NotBlank(message = "Password cannot be blank")
     private String passwordHash;
 
+    @NotBlank(message = "Role not blank")
+    private UserRoles role;
 }
