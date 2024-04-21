@@ -3,8 +3,9 @@ stages:
   - docker_build
 
 variables:
-  SONAR_HOST_URL: "http://localhost:9000"
+  SONAR_HOST_URL: "localhost:9000/"
   SONAR_LOGIN: "sqp_5b08838331b3c75e02deb42791f8c40d7081f695"
+  SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"  # Use your project key
 
 build_and_test:
   stage: build_and_test
@@ -13,7 +14,7 @@ build_and_test:
     - cd unlimitedmarketplace-V2/unlimitedmarketplace  # Change directory to where the settings.gradle file is located
     - gradle clean build
     - gradle test
-    - gradle sonar -Dsonar.projectKey=ProjectKey -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
+    - gradle sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
   tags:
     - docker  # Make sure this tag matches a runner configured to use Docker
 
