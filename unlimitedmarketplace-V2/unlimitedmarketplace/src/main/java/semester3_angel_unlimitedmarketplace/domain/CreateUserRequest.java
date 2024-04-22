@@ -2,6 +2,7 @@ package semester3_angel_unlimitedmarketplace.domain;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,6 @@ public class CreateUserRequest {
     @NotBlank(message = "Password cannot be blank")
     private String passwordHash;
 
-    @NotBlank(message = "Role not blank")
+    @NotNull
     private UserRoles role;
 }

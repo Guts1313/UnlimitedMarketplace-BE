@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,6 +24,9 @@ import org.springframework.http.ResponseEntity;
 import semester3_angel_unlimitedmarketplace.business.*;
 import semester3_angel_unlimitedmarketplace.controllers.UserController;
 import semester3_angel_unlimitedmarketplace.domain.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,6 +53,8 @@ public class UserControllerTest {
     private DeleteUserUseCase deleteUserUseCase;
 
     @Test
+    @WithMockUser(username="admin", roles={"USER", "ADMIN"})
+
     public void getUser_ShouldReturnUser() throws Exception {
         // Arrange
         GetUserResponse response = new GetUserResponse(1L, "userTest", "user@test.com");
@@ -62,37 +68,59 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email").value("user@test.com"));
     }
 
-//    @Test
-//    public void getUsers_ShouldReturnAllUsers() throws Exception {
-//        // Arrange
-//        GetAllUsersResponse response = new GetAllUsersResponse(/* Assume some response setup */);
-//        given(getUsersUseCase.getAllUsers(any(GetAllUsersRequest.class))).willReturn(response);
-//
-//        // Act & Assert
-//        mockMvc.perform(get("/unlimitedmarketplace").param("userName", "userTest"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.users").isArray());
-//    }
+    @Test
+    @WithMockUser(username="admin", roles={"ADMIN"})
+    public void getUsers_ShouldReturnAllUsers() throws Exception {
+        // Arrange
+        List<User> userList = Arrays.asList(new User(1L, "userTest1","userTest1pw", "user1@test.com",UserRoles.ADMIN)); // Include role in constructor
+        GetAllUsersResponse response = new GetAllUsersResponse(userList);
+        given(getUsersUseCase.getAllUsers(any(GetAllUsersRequest.class))).willReturn(response);
 
-//    @Test
-//    public void createUser_ShouldReturnCreated() throws Exception {
-//        // Arrange
-//        CreateUserRequest request = new CreateUserRequest("newUser", "newUser@test.com", "password", UserRoles.USER);
-//        CreateUserResponse response = new CreateUserResponse(1L, "newUser", "newUser@test.com", UserRoles.USER);
-//        given(createUserUseCase.saveUser(any(CreateUserRequest.class))).willReturn(response);
-//
-//        // Act & Assert
-//        mockMvc.perform(post("/unlimitedmarketplace")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("{\"userName\":\"newUser\",\"email\":\"newUser@test.com\",\"password\":\"password\",\"role\":\"USER\"}"))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$.id").value(1))
-//                .andExpect(jsonPath("$.userName").value("newUser"))
-//                .andExpect(jsonPath("$.email").value("newUser@test.com"));
-//
-//    }
+        // Act & Assert
+        mockMvc.perform(get("/unlimitedmarketplace").param("userName", "userTest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.allUsers").isNotEmpty())
+                .andExpect(jsonPath("$.allUsers[0].role").value("ADMIN")); // Check if the role is correctly returned
+    }
+
+
 
     @Test
+    @WithMockUser(username="admin", roles={"USER", "ADMIN"})
+
+    public void createUser_ShouldReturnCreated() throws Exception {
+        // Arrange
+        CreateUserRequest request = new CreateUserRequest("newUser", "newUser@test.com", "password", UserRoles.USER);
+        CreateUserResponse response = new CreateUserResponse(1L, "newUser", "newUser@test.com", UserRoles.USER);
+
+        // Correctly setup Mockito to expect any valid CreateUserRequest and return the prepared response
+        given(createUserUseCase.saveUser(any(CreateUserRequest.class))).willReturn(response);
+
+        // Prepare JSON content matching the structure of CreateUserRequest
+        String jsonContent = """
+        {
+            "userName": "newUser",
+            "email": "newUser@test.com",
+            "passwordHash": "password",
+            "role": "USER"
+        }""";
+
+        // Act & Assert
+        mockMvc.perform(post("/unlimitedmarketplace")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.userName").value("newUser"))
+                .andExpect(jsonPath("$.email").value("newUser@test.com"))
+                .andExpect(jsonPath("$.role").value("USER"));  // Ensure the role is also verified if it is part of the response
+
+    }
+
+
+    @Test
+    @WithMockUser(username="admin", roles={"USER", "ADMIN"})
+
     public void updateUser_ShouldReturnNoContent() throws Exception {
         // Arrange
         UpdateUserPasswordRequest request = new UpdateUserPasswordRequest(1L, "newPassword");
@@ -107,6 +135,8 @@ public class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(username="admin", roles={"USER", "ADMIN"})
+
     public void deleteUser_ShouldReturnNoContent() throws Exception {
         // Act & Assert
         mockMvc.perform(delete("/unlimitedmarketplace/{id}", 1L))

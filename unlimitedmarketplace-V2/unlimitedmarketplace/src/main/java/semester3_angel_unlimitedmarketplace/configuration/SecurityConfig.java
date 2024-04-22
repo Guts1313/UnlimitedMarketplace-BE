@@ -95,9 +95,10 @@ public class SecurityConfig {
                     "/api/v*/registration/**",
                     "/register*",
                     LOGIN,
-                    "/unlimitedmarketplace/**",
+                    ("/unlimitedmarketplace/**"),
                     "/actuator/**").permitAll();
             request.anyRequest().permitAll();
+
         });
         http.formLogin(fL -> fL.loginPage(LOGIN)
                 .usernameParameter("email").permitAll()

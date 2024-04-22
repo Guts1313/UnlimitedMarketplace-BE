@@ -5,9 +5,12 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import semester3_angel_unlimitedmarketplace.business.*;
+import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateEmailException;
+import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateUsernameException;
 import semester3_angel_unlimitedmarketplace.domain.*;
 
 import java.util.Optional;
@@ -22,12 +25,15 @@ public class UserController {
     private final UpdateUserPasswordUseCase updateUserPasswordUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
 
+    @PreAuthorize("hasRole('USER')")
+
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUser(@PathVariable(value = "id") final Long id){
         final GetUserResponse responseOptional = getUserUseCase.getUserById(id);
         return ResponseEntity.ok().body(responseOptional);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @GetMapping
     public ResponseEntity<GetAllUsersResponse> getUsers(@RequestParam(value = "userName", required = false) String userName) {
@@ -35,13 +41,22 @@ public class UserController {
         GetAllUsersResponse response = getUsersUseCase.getAllUsers(request);
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize("hasRole('USER')")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @PostMapping
-    public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request){
-        CreateUserResponse response = createUserUseCase.saveUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<?> createUser(@RequestBody @Valid CreateUserRequest request) {
+        try {
+            CreateUserResponse response = createUserUseCase.saveUser(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (DuplicateUsernameException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
+        } catch (DuplicateEmailException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing your request.");
+        }
     }
-
+    @PreAuthorize("hasRole('USER')")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @PutMapping("{id}")
     public ResponseEntity<Void> updateUser(@PathVariable("id") long id,
@@ -54,7 +69,7 @@ public class UserController {
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @DeleteMapping("{id}")
     @Transactional
-
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") final long id){
         deleteUserUseCase.deleteUser(id);
        return ResponseEntity.noContent().build();

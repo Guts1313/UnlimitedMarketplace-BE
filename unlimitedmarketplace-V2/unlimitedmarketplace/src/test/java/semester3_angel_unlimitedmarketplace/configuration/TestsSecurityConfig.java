@@ -20,10 +20,14 @@ public class TestsSecurityConfig {
 
     @Bean
     public SecurityFilterChain disableSecurity(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authz -> authz.anyRequest().permitAll()) // Permit all requests without authentication
-                .csrf(AbstractHttpConfigurer::disable); // Disable CSRF protection for testing purposes
+        http
+                .csrf(AbstractHttpConfigurer::disable) // Disabling CSRF as per your setup
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v*/registration/**", "/register*", "/login", "/actuator/**").permitAll()  // Allowing unauthenticated access to these endpoints
+                        .requestMatchers("/unlimitedmarketplace/**").hasRole("ADMIN")  // Restricting this endpoint to ADMIN only
+                        .anyRequest().authenticated()  // All other requests require authentication
+                );
 
-        System.out.println("Loading Test Security Configuration");
         return http.build();
     }
 }
