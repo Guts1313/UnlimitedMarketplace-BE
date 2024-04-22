@@ -9,12 +9,12 @@ import java.util.Set;
 @EqualsAndHashCode
 public class AccessTokenImpl implements AccessToken{
     private final String subject;
-    private final Long studentId;
+    private final Long userId;
     private final Set<String> roles;
 
     public AccessTokenImpl(String subject, Long studentId, Set<String> roles) {
         this.subject = subject;
-        this.studentId = studentId;
+        this.userId = studentId;
         this.roles = roles != null ? Set.copyOf(roles) : Collections.emptySet();
     }
 

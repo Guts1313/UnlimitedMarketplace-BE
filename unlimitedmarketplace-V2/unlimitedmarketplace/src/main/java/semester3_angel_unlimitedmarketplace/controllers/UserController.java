@@ -3,15 +3,20 @@ package semester3_angel_unlimitedmarketplace.controllers;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import semester3_angel_unlimitedmarketplace.business.*;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateEmailException;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateUsernameException;
 import semester3_angel_unlimitedmarketplace.domain.*;
+import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
 import java.util.Optional;
 
@@ -24,6 +29,7 @@ public class UserController {
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserPasswordUseCase updateUserPasswordUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
+    private static final Logger log = LoggerFactory.getLogger(AccessTokenEncoderDecoderImpl.class);
 
     @PreAuthorize("hasRole('USER')")
 
@@ -33,12 +39,15 @@ public class UserController {
         final GetUserResponse responseOptional = getUserUseCase.getUserById(id);
         return ResponseEntity.ok().body(responseOptional);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @GetMapping
     public ResponseEntity<GetAllUsersResponse> getUsers(@RequestParam(value = "userName", required = false) String userName) {
         GetAllUsersRequest request = GetAllUsersRequest.builder().userName(userName).build();
         GetAllUsersResponse response = getUsersUseCase.getAllUsers(request);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Authenticated user: " + auth.getName() + " with roles: " + auth.getAuthorities());
         return ResponseEntity.ok(response);
     }
     @PreAuthorize("hasRole('USER')")
