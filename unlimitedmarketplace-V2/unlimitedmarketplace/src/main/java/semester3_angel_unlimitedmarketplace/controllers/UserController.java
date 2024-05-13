@@ -50,7 +50,7 @@ public class UserController {
         log.info("Authenticated user: " + auth.getName() + " with roles: " + auth.getAuthorities());
         return ResponseEntity.ok(response);
     }
-    @PreAuthorize("hasRole('USER')")
+//    @PreAuthorize("hasRole('USER')")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody @Valid CreateUserRequest request) {

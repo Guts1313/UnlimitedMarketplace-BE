@@ -39,7 +39,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
         userEntity.setUserName(request.getUserName());
         userEntity.setPasswordHash(passwordEncoder.encode(request.getPasswordHash())); // Hashing the password
         userEntity.setEmail(request.getEmail());
-        userEntity.setUserRole(UserRoles.USER);
+        userEntity.setUserRole(request.getRole());
         UserEntity savedUser = userRepository.save(userEntity);
 
         // Return a response object
