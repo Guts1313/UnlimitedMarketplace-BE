@@ -1,5 +1,8 @@
 package semester3_angel_unlimitedmarketplace.configuration;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +30,7 @@ import java.util.stream.Collectors;
 @Component
 public class AuthenticationRequestFilter extends OncePerRequestFilter {
 
-    private static final String SPRING_SECURITY_ROLE_PREFIX = "ROLE_";
+    private static final String SPRING_SECURITY_ROLE_PREFIX = "";
     private static final Logger log = LoggerFactory.getLogger(AccessTokenEncoderDecoderImpl.class);
 
     @Autowired
@@ -36,14 +39,15 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
-        final String requestTokenHeader = request.getHeader("Authorization");
+        String requestTokenHeader = request.getHeader("Authorization");
+        log.info("Received Authorization Header: {}", requestTokenHeader);
         if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
 
         String accessTokenString = requestTokenHeader.substring(7);
+        log.info("Attempting to decode JWT: {}", accessTokenString);
 
         try {
             AccessToken accessToken = accessTokenDecoder.decode(accessTokenString);
@@ -51,31 +55,29 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } catch (Exception e) {
             logger.error("Error validating access token", e);
-            sendAuthenticationError(response);
+            sendAuthenticationError(response, "Invalid JWT: " + e.getMessage());
         }
     }
 
-    private void sendAuthenticationError(HttpServletResponse response) throws IOException {
+    private void sendAuthenticationError(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"" + message + "\"}");
         response.flushBuffer();
     }
 
     private void setupSpringSecurityContext(AccessToken accessToken) {
-        // Map each role string to a SimpleGrantedAuthority object
         List<GrantedAuthority> grantedAuthorities = accessToken.getRoles()
                 .stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(role -> new SimpleGrantedAuthority(SPRING_SECURITY_ROLE_PREFIX + role))
                 .collect(Collectors.toList());
 
-        // Use these authorities when creating the UserDetails
         UserDetails userDetails = new User(accessToken.getSubject(), "", grantedAuthorities);
+        log.info("User Authorities in Security Context: " + userDetails.getAuthorities());
 
-        log.info("User Authorities in Security Context: " + userDetails.getAuthorities());  // This should now correctly reflect the authorities
-
-        // Setup the security context with the UserDetails
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, grantedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
 

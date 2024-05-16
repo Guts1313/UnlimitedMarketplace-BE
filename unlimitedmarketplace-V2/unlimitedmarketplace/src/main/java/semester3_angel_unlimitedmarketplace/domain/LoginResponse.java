@@ -11,9 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class LoginResponse {
-    private String token;
+    private String accessToken;
+    private String refreshToken;
+
     private String type = "Bearer";  // If you are using Bearer tokens, otherwise adjust as necessary
-    public LoginResponse(String token) {
-        this.token = token;
+
+    public LoginResponse(String token,String refreshToken) {
+        this.accessToken = token;
+        this.refreshToken=refreshToken;
     }
 }

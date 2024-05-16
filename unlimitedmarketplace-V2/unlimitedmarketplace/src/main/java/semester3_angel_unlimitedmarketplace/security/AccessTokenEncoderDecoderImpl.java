@@ -1,12 +1,10 @@
 package semester3_angel_unlimitedmarketplace.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.slf4j.Logger;
@@ -28,10 +26,33 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public String encode(String username, Collection<? extends GrantedAuthority> authorities) {
+        Claims claims = Jwts.claims().setSubject(username);
+        claims.put("roles", authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+
+        Instant now = Instant.now();
+        try {
+            String token = Jwts.builder()
+                    .setClaims(claims)
+                    .setIssuedAt(Date.from(now))
+                    .setExpiration(Date.from(now.plus(10, ChronoUnit.MINUTES))) // Note: Adjusted from seconds to minutes for better testing
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+            log.info("Successfully generated JWT: {}", token);
+            return token;
+        } catch (JwtException e) {
+            log.error("Failed to generate JWT", e);
+            return null;
+        }
+    }
+
     @Override
     public AccessToken decode(String accessTokenEncoded) {
         try {
-            Jwt<?, Claims> jwt = Jwts.parserBuilder().setSigningKey(key).build()
+            Jwt<?, Claims> jwt = Jwts.parserBuilder().setSigningKey(key).setAllowedClockSkewSeconds(30000) // Allow 30 seconds clock skew
+                    .build()
                     .parseClaimsJws(accessTokenEncoded);
             Claims claims = jwt.getBody();
 

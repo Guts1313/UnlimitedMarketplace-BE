@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.BeanDefinitionDsl;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -34,11 +35,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import semester3_angel_unlimitedmarketplace.business.impl.UserDetailsServiceImpl;
+import semester3_angel_unlimitedmarketplace.domain.UserRoles;
 import semester3_angel_unlimitedmarketplace.persistence.UserRepository;
 
 import javax.crypto.SecretKey;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -54,12 +57,14 @@ public class SecurityConfig {
     public SecurityConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Adjust according to your frontend URL
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+//        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L); // 1 hour
 
@@ -89,21 +94,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(withDefaults());
         http.requiresChannel(c -> c.requestMatchers("/actuator/**").requiresInsecure());
         http.authorizeHttpRequests(request -> {
             request.requestMatchers(
-                    "/api/v*/registration/**",
-                    "/register*",
-                    LOGIN,
-                    ("/unlimitedmarketplace/**"),
-                    "/actuator/**").permitAll();
+                            "/api/v*/registration/**",
+                            "/register*",
+                            LOGIN,
+                            ("/unlimitedmarketplace/**"),
+                            "/actuator/**").permitAll()
+                    .requestMatchers("/unlimitedmarketplace/products/").authenticated();
+
             request.anyRequest().permitAll();
 
         });
         http.formLogin(fL -> fL.loginPage(LOGIN)
                 .usernameParameter("email").permitAll()
                 .defaultSuccessUrl("/", true)
-                .failureUrl("/login-error"));
+                .failureUrl("/login"));
         http.logout(logOut -> logOut.logoutUrl("/logout")
                 .clearAuthentication(true)
                 .invalidateHttpSession(true)
@@ -113,6 +121,7 @@ public class SecurityConfig {
         return http.build();
 
     }
+
     @Bean
     public SecretKey jwtSecretKey() {
         return Keys.secretKeyFor(SignatureAlgorithm.HS256); // Secure key generation

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -64,7 +65,7 @@ public class ProductController {
             // Optionally use auth object for further logic if needed
         } catch (Exception error) {
             // Log the error or handle it as necessary
-            return ResponseEntity.internalServerError().build(); // Return an appropriate error response
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Return an appropriate error response
         }
         return ResponseEntity.ok(response); // Return the response entity with the retrieved product
     }
