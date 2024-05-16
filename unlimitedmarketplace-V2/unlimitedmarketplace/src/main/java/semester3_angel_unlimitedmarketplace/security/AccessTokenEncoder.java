@@ -1,7 +1,13 @@
 package semester3_angel_unlimitedmarketplace.security;
 
-public interface AccessTokenEncoder {
-    AccessToken encode(String accessTokenEncoded);
+import org.springframework.security.core.GrantedAuthority;
 
-    String encode(AccessToken accessTokenEncoded);
+import java.util.Collection;
+
+public interface AccessTokenEncoder {
+    String encode(String username, Collection<? extends GrantedAuthority> authorities);
+
+    String encodeAndGetId(String username, Long userId, Collection<? extends GrantedAuthority> authorities);
+
+
 }

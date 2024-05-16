@@ -48,6 +48,8 @@ dependencies {
 	implementation("org.springframework.security:spring-security-config:6.2.4")
 	testImplementation("org.springframework.security:spring-security-test:6.0.0")
 	implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
+
 }
 jacoco {
 	toolVersion = "0.8.9"  // specify the version you want to use
