@@ -20,6 +20,7 @@ import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 
@@ -45,6 +46,17 @@ public class BidServiceImpl implements BidService {
             return BigDecimal.ZERO; // Return ZERO if no bids are present
         }
     }
+    public List<Long> findPotentiallyOutbidUserIds(Long productId, BigDecimal latestBidAmount) {
+        return bidRepository.findUserIdsOfOutbidUsers(productId, latestBidAmount);
+    }
+
+    public BidEntity findSecondHighestBid(Long productId) {
+        Page<BidEntity> bids = bidRepository.findHighestBidByProductId(productId, PageRequest.of(0, 2));
+        if (bids.hasContent() && bids.getContent().size() > 1) {
+            return bids.getContent().get(1); // get the second highest bid
+        }
+        return null;
+    }
 
     @Override
     public BidEntity placeBid(BidRequest bidRequest) {
@@ -57,15 +69,13 @@ public class BidServiceImpl implements BidService {
         Page<BidEntity> highestBidPage = bidRepository.findHighestBidByProductId(product.getId(), limitOne);
         Optional<BidEntity> highestBidOptional = highestBidPage.get().findFirst(); // Fetch the first and only result
 
-        if (highestBidOptional.isPresent() && bidRequest.getBidAmount() != null) {
+        if (highestBidOptional.isPresent()) {
             BigDecimal highestBidAmount = highestBidOptional.get().getAmount();
             if (bidRequest.getBidAmount().compareTo(highestBidAmount) <= 0) {
                 throw new IllegalArgumentException("New bid must be higher than the current highest bid.");
             }
-        } else if (!highestBidOptional.isPresent()) {
-            // No bids found, first bid is accepted
         }
-
+        // Allow the first bid on the product if no previous bids exist
         BidEntity newBid = new BidEntity();
         newBid.setAmount(bidRequest.getBidAmount());
         newBid.setBidTime(LocalDateTime.now());

@@ -56,19 +56,25 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
 
         Instant now = Instant.now();
         try {
+            log.info("Attempting to generate JWT for user: {}", username);
+            log.info("JWT claims set: {}", claims);
+
             String token = Jwts.builder()
                     .setClaims(claims)
                     .setIssuedAt(Date.from(now))
-                    .setExpiration(Date.from(now.plus(10, ChronoUnit.MINUTES))) // Note: Adjusted from seconds to minutes for better testing
+                    .setExpiration(Date.from(now.plus(10, ChronoUnit.MINUTES))) // Adjusted from seconds to minutes for better testing
                     .signWith(key, SignatureAlgorithm.HS256)
                     .compact();
+
             log.info("Successfully generated JWT: {}", token);
             return token;
         } catch (JwtException e) {
-            log.error("Failed to generate JWT", e);
+            log.error("Failed to generate JWT for user: {} with error: {}", username, e.getMessage());
             return null;
         }
     }
+
+
 
     public AccessToken decodeEncoded(String accessTokenEncoded) {
         try {

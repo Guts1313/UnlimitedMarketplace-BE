@@ -63,6 +63,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         }
                     }
 
+
                 })
                 .setAllowedOrigins("http://localhost:3000")
                 .withSockJS();
@@ -89,6 +90,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/queue", "/topic");
+        registry.setUserDestinationPrefix("/user");  // Ensure this is set if using convertAndSendToUser
         registry.setApplicationDestinationPrefixes("/app");
     }
 }

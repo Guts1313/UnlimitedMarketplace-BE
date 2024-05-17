@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -16,10 +17,13 @@ import org.springframework.web.bind.annotation.*;
 import semester3_angel_unlimitedmarketplace.business.BidService;
 import semester3_angel_unlimitedmarketplace.domain.BidRequest;
 import semester3_angel_unlimitedmarketplace.domain.BidResponse;
+import semester3_angel_unlimitedmarketplace.domain.OutbidNotification;
 import semester3_angel_unlimitedmarketplace.persistence.entity.BidEntity;
 import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
 import java.math.BigDecimal;
+import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/bids")
@@ -33,6 +37,7 @@ public class BidController {
         this.messagingTemplate = messagingTemplate;
         this.bidService = bidService;
     }
+
     @GetMapping("/latest/{productId}")
     public ResponseEntity<?> getLatestBid(@PathVariable Long productId) {
         try {
@@ -45,22 +50,35 @@ public class BidController {
         }
     }
 
+    @MessageMapping("/notification")
+    public void subscribeToNotifications(String message) {
+        // This method is a placeholder to ensure subscription can be established.
+        // Actual notifications will be sent from elsewhere in the application logic
+
+    }
+
     @MessageMapping("/placeBid")
     public void handleBid(BidRequest bidRequest, SimpMessageHeaderAccessor headerAccessor) {
         try {
             BidEntity bid = bidService.placeBid(bidRequest);
-            BidResponse response = new BidResponse(bid.getProduct().getId(), bid.getAmount(), "success");
+            BigDecimal latestBidAmount = bid.getAmount();
+            Long productId = bid.getProduct().getId();
 
-            // Sending bid response to the user who placed the bid
-            messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(), "/queue/bidResponse", response);
+            // Notify all subscribers about the new bid
+            BidResponse bidResponse = new BidResponse(productId, latestBidAmount, "success");
+            messagingTemplate.convertAndSend("/topic/product" + productId, bidResponse);
 
-            // Broadcasting bid update to all subscribers of this product
-            messagingTemplate.convertAndSend("/topic/product" + bid.getProduct().getId(), response);
+            messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(),
+                    "/queue/outbid" + productId,
+                    bidResponse.getBidAmount().toString());
+
         } catch (Exception e) {
             log.error("Error processing bid: {}", e.getMessage(), e);
-            // Send error message back to the user
-            messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(), "/queue/bidResponse", new BidResponse(null, null, "error", e.getMessage()));
+            messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(),
+                    "/queue/bidResponse", new BidResponse(null, null, "error", e.getMessage()));
         }
     }
+
+
 }
 
