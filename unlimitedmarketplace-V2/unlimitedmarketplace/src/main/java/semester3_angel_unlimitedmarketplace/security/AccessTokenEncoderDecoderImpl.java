@@ -25,6 +25,28 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
+    public String encodeAndGetId(String username, Long userId, Collection<? extends GrantedAuthority> authorities) {
+        Claims claims = Jwts.claims().setSubject(username);
+        claims.put("roles", authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        claims.put("id", userId); // Add the user ID to the token
+
+        Instant now = Instant.now();
+        try {
+            String token = Jwts.builder()
+                    .setClaims(claims)
+                    .setIssuedAt(Date.from(now))
+                    .setExpiration(Date.from(now.plus(10, ChronoUnit.MINUTES))) // Adjusted for testing purposes
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+            log.info("Successfully generated JWT: {}", token);
+            return token;
+        } catch (JwtException e) {
+            log.error("Failed to generate JWT", e);
+            return null;
+        }
+    }
 
     public String encode(String username, Collection<? extends GrantedAuthority> authorities) {
         Claims claims = Jwts.claims().setSubject(username);
@@ -48,8 +70,7 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
         }
     }
 
-    @Override
-    public AccessToken decode(String accessTokenEncoded) {
+    public AccessToken decodeEncoded(String accessTokenEncoded) {
         try {
             Jwt<?, Claims> jwt = Jwts.parserBuilder().setSigningKey(key).setAllowedClockSkewSeconds(30000) // Allow 30 seconds clock skew
                     .build()
@@ -71,31 +92,18 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
         }
     }
 
-
-
-
     @Override
-    public AccessToken encode(String accessTokenEncoded) {
-        return null;
-    }
-
-    @Override
-    public String encode(AccessToken accessToken) {
-        Map<String, Object> claimsMap = new HashMap<>();
-        if (!CollectionUtils.isEmpty(accessToken.getRoles())) {
-            claimsMap.put("roles", accessToken.getRoles());
+    public Claims decode(String accessTokenEncoded) throws InvalidAccessTokenException {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .setAllowedClockSkewSeconds(30000) // Allow 5 minutes of clock skew
+                    .build()
+                    .parseClaimsJws(accessTokenEncoded)
+                    .getBody();
+        } catch (JwtException e) {
+            log.error("JWT decoding failed", e);
+            throw new InvalidAccessTokenException("Failed to decode the access token.");
         }
-        if (accessToken.getUserId() != null) {
-            claimsMap.put("id", accessToken.getUserId());
-        }
-
-        Instant now = Instant.now();
-        return Jwts.builder()
-                .setSubject(accessToken.getSubject())
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plus(30, ChronoUnit.MINUTES)))
-                .addClaims(claimsMap)
-                .signWith(key)
-                .compact();
     }
 }

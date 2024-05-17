@@ -1,6 +1,9 @@
 package semester3_angel_unlimitedmarketplace.security;
 
-public interface AccessTokenDecoder {
-    AccessToken decode(String accessTokenEncoded);
+import io.jsonwebtoken.Claims;
 
+public interface AccessTokenDecoder {
+    Claims decode(String accessTokenEncoded) throws InvalidAccessTokenException;
+
+    AccessToken decodeEncoded(String accessTokenString);
 }

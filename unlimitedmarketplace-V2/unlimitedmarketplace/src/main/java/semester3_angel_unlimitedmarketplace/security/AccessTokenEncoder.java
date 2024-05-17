@@ -7,7 +7,7 @@ import java.util.Collection;
 public interface AccessTokenEncoder {
     String encode(String username, Collection<? extends GrantedAuthority> authorities);
 
-    AccessToken encode(String accessTokenEncoded);
+    String encodeAndGetId(String username, Long userId, Collection<? extends GrantedAuthority> authorities);
 
-    String encode(AccessToken accessTokenEncoded);
+
 }

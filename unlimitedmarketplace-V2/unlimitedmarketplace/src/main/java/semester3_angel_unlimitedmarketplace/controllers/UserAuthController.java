@@ -12,10 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
-import semester3_angel_unlimitedmarketplace.domain.AuthResponse;
-import semester3_angel_unlimitedmarketplace.domain.LoginRequest;
-import semester3_angel_unlimitedmarketplace.domain.LoginResponse;
-import semester3_angel_unlimitedmarketplace.domain.UserService;
+import semester3_angel_unlimitedmarketplace.domain.*;
+import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
 import semester3_angel_unlimitedmarketplace.security.AccessToken;
 import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 import semester3_angel_unlimitedmarketplace.security.AccessTokenImpl;
@@ -60,9 +58,13 @@ public class UserAuthController {
             }
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = tokenService.encode(authentication.getName(), authentication.getAuthorities());
+            UserEntity user = userService.findByUsername(loginRequest.getUsername());
+            Long userId = user.getId();
+            String jwt = tokenService.encodeAndGetId(authentication.getName(), userId,authentication.getAuthorities());
             String refreshToken = refreshTokenService.createRefreshToken(loginRequest.getUsername()); // Generate and store refresh token
-
+            AccessToken token = tokenService.decodeEncoded(jwt);
+            System.out.println("Acc tok: " + token); // Check the JWT output
+            System.out.println("UID: " + userId); // Check the JWT output
             System.out.println("Generated JWT: " + jwt); // Check the JWT output
 
             if (jwt == null) {
@@ -71,7 +73,7 @@ public class UserAuthController {
             }
 
             // Return both tokens in the response
-            LoginResponse response = new LoginResponse(jwt, refreshToken);
+            LoginResponse response = new LoginResponse(jwt, refreshToken,userId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("Error during authentication: " + e.getMessage());

@@ -42,6 +42,7 @@ import javax.crypto.SecretKey;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -61,17 +62,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Adjust according to your frontend URL
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000")); // Use patterns for flexibility
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setAllowedHeaders(Collections.singletonList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        // If you are using credentials (cookies, authentication), you must specify origins, not use '*'
+        configuration.setAllowCredentials(true); // This should be set based on your specific needs
         configuration.setMaxAge(3600L); // 1 hour
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 //    public SecurityFilterChain filterChain(HttpSecurity httpSecurity,
 //                                           AuthenticationEntryPoint authenticationEntryPoint,
 //                                           AuthenticationRequestFilter authenticationRequestFilter) throws Exception {
@@ -103,7 +105,9 @@ public class SecurityConfig {
                             LOGIN,
                             ("/unlimitedmarketplace/**"),
                             "/actuator/**").permitAll()
-                    .requestMatchers("/unlimitedmarketplace/products/").authenticated();
+                    .requestMatchers("/unlimitedmarketplace/products/").authenticated()
+                    .requestMatchers("/websocket-sockjs-stomp/**").permitAll()  // Allow all WebSocket connection requests
+            ;
 
             request.anyRequest().permitAll();
 
@@ -149,15 +153,6 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:3000");
-            }
-        };
-    }
 
 }
 

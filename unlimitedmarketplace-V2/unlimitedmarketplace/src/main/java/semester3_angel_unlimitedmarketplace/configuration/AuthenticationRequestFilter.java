@@ -39,6 +39,12 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        // Skip filter for WebSocket upgrade requests
+        if ("websocket".equalsIgnoreCase(request.getHeader("Upgrade"))) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String requestTokenHeader = request.getHeader("Authorization");
         log.info("Received Authorization Header: {}", requestTokenHeader);
         if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer ")) {
@@ -50,7 +56,7 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
         log.info("Attempting to decode JWT: {}", accessTokenString);
 
         try {
-            AccessToken accessToken = accessTokenDecoder.decode(accessTokenString);
+            AccessToken accessToken = accessTokenDecoder.decodeEncoded(accessTokenString);
             setupSpringSecurityContext(accessToken);
             chain.doFilter(request, response);
         } catch (Exception e) {
@@ -58,6 +64,7 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
             sendAuthenticationError(response, "Invalid JWT: " + e.getMessage());
         }
     }
+
 
     private void sendAuthenticationError(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
