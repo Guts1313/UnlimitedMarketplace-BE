@@ -58,9 +58,9 @@ public class UserController {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (DuplicateUsernameException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (DuplicateEmailException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            return ResponseEntity.status(ex.getStatusCode()).body(response);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

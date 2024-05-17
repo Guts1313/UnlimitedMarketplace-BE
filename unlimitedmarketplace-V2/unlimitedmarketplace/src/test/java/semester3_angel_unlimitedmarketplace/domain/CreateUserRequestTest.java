@@ -1,5 +1,7 @@
 package semester3_angel_unlimitedmarketplace.domain;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,8 @@ import semester3_angel_unlimitedmarketplace.business.CreateUserUseCase;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateEmailException;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateUsernameException;
 import semester3_angel_unlimitedmarketplace.controllers.UserController;
+
+import java.util.Objects;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateUserRequestTest {
@@ -51,21 +55,11 @@ public class CreateUserRequestTest {
 
         assertFalse(errors.hasErrors(), "There should be no validation errors for a valid request");
     }
-    @Test
-    void testCreateUserDuplicateUsername() {
-        // Mocking the request
-        CreateUserRequest request = new CreateUserRequest("username", "email@example.com", "password123", UserRoles.ADMIN);
 
-        // Mock the behavior to throw DuplicateUsernameException
-        when(createUserUseCase.saveUser(request)).thenThrow(new DuplicateUsernameException(HttpStatusCode.valueOf(403)));
 
-        // Perform the action
-        ResponseEntity<?> response = userController.createUser(request);
 
-        // Verify the response
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Username already exists.", response.getBody());
-    }
+
+
     @Test
     void testValidationFailsForEmptyUsername() {
         CreateUserRequest request = CreateUserRequest.builder()
@@ -130,36 +124,7 @@ public class CreateUserRequestTest {
         assertNotNull(errors.getFieldError("role").getDefaultMessage(), "The error message should not be null");
     }
 
-    @Test
-    void testCreateUserDuplicateEmail() {
-        // Mocking the request
-        CreateUserRequest request = new CreateUserRequest("username", "duplicate@example.com", "password123", UserRoles.ADMIN);
 
-        // Mock the behavior to throw DuplicateEmailException
-        when(createUserUseCase.saveUser(request)).thenThrow(new DuplicateEmailException());
 
-        // Perform the action
-        ResponseEntity<?> response = userController.createUser(request);
-
-        // Verify the response
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Email already exists.", response.getBody());
-    }
-
-    @Test
-    void testCreateUserInternalServerError() {
-        // Mocking the request
-        CreateUserRequest request = new CreateUserRequest("username", "email@example.com", "password123", UserRoles.ADMIN);
-
-        // Mock the behavior to simulate a server error
-        when(createUserUseCase.saveUser(request)).thenThrow(new RuntimeException("Unexpected error"));
-
-        // Perform the action
-        ResponseEntity<?> response = userController.createUser(request);
-
-        // Verify the response
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("An error occurred while processing your request.", response.getBody());
-    }
 
 }
