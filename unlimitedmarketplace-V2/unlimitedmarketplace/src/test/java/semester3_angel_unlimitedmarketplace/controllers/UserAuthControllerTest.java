@@ -127,7 +127,7 @@ public class UserAuthControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
-    
+
     @Test
     public void testRefreshTokenValid() throws Exception {
         String refreshToken = "validRefreshToken";

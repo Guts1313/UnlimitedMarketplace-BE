@@ -53,16 +53,16 @@ public class UserController {
 //    @PreAuthorize("hasRole('USER')")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody @Valid CreateUserRequest request) {
+    public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
+        CreateUserResponse response = createUserUseCase.saveUser(request);
         try {
-            CreateUserResponse response = createUserUseCase.saveUser(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (DuplicateUsernameException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } catch (DuplicateEmailException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing your request.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
     @PreAuthorize("hasRole('USER')")
