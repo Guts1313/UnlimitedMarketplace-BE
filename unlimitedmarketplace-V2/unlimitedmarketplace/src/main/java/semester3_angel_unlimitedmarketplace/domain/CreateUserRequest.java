@@ -20,11 +20,12 @@ public class CreateUserRequest {
     private String userName;
 
     @Email(message = "Email should be valid")
+    @NotBlank(message = "Email cannot be blank")
     private String email;
 
     @NotBlank(message = "Password cannot be blank")
     private String passwordHash;
 
-    @NotNull
+    @NotNull(message = "Role cannot be null")
     private UserRoles role;
 }

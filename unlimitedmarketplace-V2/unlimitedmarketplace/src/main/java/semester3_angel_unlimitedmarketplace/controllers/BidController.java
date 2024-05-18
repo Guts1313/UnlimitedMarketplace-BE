@@ -58,27 +58,39 @@ public class BidController {
     }
 
     @MessageMapping("/placeBid")
-    public void handleBid(BidRequest bidRequest, SimpMessageHeaderAccessor headerAccessor) {
+    public void handleBid(BidRequest bidRequest, SimpMessageHeaderAccessor headerAccessor){
         try {
+            if (bidRequest == null) {
+                throw new IllegalArgumentException("Bid request cannot be null.");
+            }
+
             BidEntity bid = bidService.placeBid(bidRequest);
+
+            if (bid == null) {
+                throw new IllegalStateException("Bid creation failed, no bid returned.");
+            }
+
             BigDecimal latestBidAmount = bid.getAmount();
             Long productId = bid.getProduct().getId();
 
-            // Notify all subscribers about the new bid
             BidResponse bidResponse = new BidResponse(productId, latestBidAmount, "success");
             messagingTemplate.convertAndSend("/topic/product" + productId, bidResponse);
 
-            messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(),
-                    "/queue/outbid" + productId,
-                    bidResponse.getBidAmount().toString());
-
+            Principal principal = headerAccessor.getUser();
+            if (principal != null) {
+                messagingTemplate.convertAndSendToUser(principal.getName(),
+                        "/queue/outbid" + productId,
+                        bidResponse.getBidAmount().toString());
+            }
         } catch (Exception e) {
             log.error("Error processing bid: {}", e.getMessage(), e);
-            messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(),
-                    "/queue/bidResponse", new BidResponse(null, null, "error", e.getMessage()));
+            if (headerAccessor.getUser() != null) {
+                messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(),
+                        "/queue/bidResponse", new BidResponse(null, null, "error", e.getMessage()));
+            }
         }
+
+
     }
-
-
 }
 

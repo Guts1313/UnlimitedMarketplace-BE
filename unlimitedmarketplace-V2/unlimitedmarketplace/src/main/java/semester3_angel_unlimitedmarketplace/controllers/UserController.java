@@ -54,17 +54,18 @@ public class UserController {
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @PostMapping
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
-        CreateUserResponse response = createUserUseCase.saveUser(request);
         try {
+            CreateUserResponse response = createUserUseCase.saveUser(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (DuplicateUsernameException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (DuplicateEmailException ex) {
-            return ResponseEntity.status(ex.getStatusCode()).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PreAuthorize("hasRole('USER')")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @PutMapping("{id}")
