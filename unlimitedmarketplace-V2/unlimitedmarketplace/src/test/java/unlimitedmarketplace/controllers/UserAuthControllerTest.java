@@ -76,7 +76,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-    public void testAuthenticateUser() throws Exception {
+     void testAuthenticateUser() throws Exception {
         String username = "gosu";
         String passwordHash = "testpass";
 
@@ -100,7 +100,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-    public void testAuthenticateUserReturnsJwtToken() throws Exception {
+     void testAuthenticateUserReturnsJwtToken() throws Exception {
         // Arrange
         String username = "gosu";
         String passwordHash = "testpass";
@@ -125,7 +125,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-    public void testRefreshTokenValid() throws Exception {
+     void testRefreshTokenValid() throws Exception {
         String refreshToken = "validRefreshToken";
         String username = "user";
         String newAccessToken = "newAccessToken";
@@ -151,7 +151,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-    public void testRefreshTokenInvalid() throws Exception {
+     void testRefreshTokenInvalid() throws Exception {
         String refreshToken = "invalidRefreshToken";
 
         when(refreshTokenService.isValid(refreshToken)).thenReturn(false);

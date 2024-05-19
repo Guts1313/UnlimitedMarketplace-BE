@@ -1,5 +1,7 @@
 package unlimitedmarketplace.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +20,6 @@ import unlimitedmarketplace.security.RefreshTokenServiceImpl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/auth")
@@ -28,14 +29,14 @@ public class UserAuthController {
     private final AccessTokenEncoderDecoderImpl tokenService;
     private final RefreshTokenServiceImpl refreshTokenService;
     private final UserService userService; // Added UserService
-//    private static final Logger log = (Logger) LoggerFactory.getLogger(UserAuthController.class);
+    private static final Logger logs = LoggerFactory.getLogger(UserAuthController.class);
 
     public UserAuthController(AuthenticationManager authenticationManager, AccessTokenEncoderDecoderImpl tokenService,
                               RefreshTokenServiceImpl refreshTokenService, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.refreshTokenService = refreshTokenService;
-        this.userService = userService; // Initialize in constructor
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -49,34 +50,33 @@ public class UserAuthController {
             );
 
             if (authentication == null || !authentication.isAuthenticated()) {
-//                log.info("Authentication failed.");
+                logs.info("Authentication failed.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserEntity user = userService.findByUsername(loginRequest.getUsername());
             Long userId = user.getId();
-            String jwt = tokenService.encodeAndGetId(authentication.getName(), userId,authentication.getAuthorities());
+            String jwt = tokenService.encodeAndGetId(authentication.getName(), userId, authentication.getAuthorities());
             String refreshToken = refreshTokenService.createRefreshToken(loginRequest.getUsername()); // Generate and store refresh token
             AccessToken token = tokenService.decodeEncoded(jwt);
-            System.out.println("Acc tok: " + token); // Check the JWT output
-            System.out.println("UID: " + userId); // Check the JWT output
-            System.out.println("Generated JWT: " + jwt); // Check the JWT output
+            logs.info("Acc tok: {}" , token);
+            logs.info("UID: {}" , userId);
+            logs.info("Generated JWT: {}" , jwt);
 
             if (jwt == null) {
-//                log.info("JWT is null, check tokenService and key configuration.");
+                logs.info("JWT is null, check tokenService and key configuration.");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
 
             // Return both tokens in the response
-            LoginResponse response = new LoginResponse(jwt, refreshToken,userId);
+            LoginResponse response = new LoginResponse(jwt, refreshToken, userId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-//            log.info("Error during authentication: " + e.getMessage());
+            logs.info("Error during authentication: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
 
     @PostMapping("/refresh-token")

@@ -14,7 +14,6 @@ import unlimitedmarketplace.business.CreateProductUseCase;
 import unlimitedmarketplace.business.GetAllProductsUseCase;
 import unlimitedmarketplace.business.GetProductUseCase;
 import unlimitedmarketplace.domain.*;
-import unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/products")

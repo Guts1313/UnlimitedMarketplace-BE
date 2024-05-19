@@ -20,7 +20,6 @@ import unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Configuration

@@ -19,7 +19,7 @@ public class RefreshTokenServiceImpl {
     public String createRefreshToken(String username) {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiryDate(Instant.now().plusMillis(7 * 24 * 60 * 60 * 1000)); // 7 days validity
+        refreshToken.setExpiryDate(Instant.now().plusMillis((long) 7 * 24 * 60 * 60 * 1000)); // 7 days validity
         refreshToken.setUsername(username);
         refreshTokenRepository.save(refreshToken);
         return refreshToken.getToken();
