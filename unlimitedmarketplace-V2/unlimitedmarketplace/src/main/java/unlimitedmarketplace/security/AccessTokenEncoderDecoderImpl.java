@@ -27,10 +27,12 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
     }
     public String encodeAndGetId(String username, Long userId, Collection<? extends GrantedAuthority> authorities) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put(ROLES, authorities.stream()
+        claims.put(ROLES, List.copyOf(authorities.stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+                .toList()));
         claims.put("id", userId); // Add the user ID to the token
+
+
 
         Instant now = Instant.now();
         try {
@@ -50,9 +52,10 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
 
     public String encode(String username, Collection<? extends GrantedAuthority> authorities) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put(ROLES, authorities.stream()
+        claims.put(ROLES, List.copyOf(authorities.stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+                .toList()));
+
 
         Instant now = Instant.now();
         try {

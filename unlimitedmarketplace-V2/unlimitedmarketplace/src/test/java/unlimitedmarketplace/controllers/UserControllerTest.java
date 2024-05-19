@@ -47,7 +47,7 @@ import java.util.List;
     @Test
     @WithMockUser(username="admin", roles={"USER", "ADMIN"})
 
-    public void getUser_ShouldReturnUser() throws Exception {
+     void getUser_ShouldReturnUser() throws Exception {
         // Arrange
         GetUserResponse response = new GetUserResponse(1L, "userTest", "user@test.com");
         given(getUserUseCase.getUserById(1L)).willReturn(response);
@@ -62,7 +62,7 @@ import java.util.List;
 
     @Test
     @WithMockUser(username="admin", roles={"ADMIN"})
-    public void getUsers_ShouldReturnAllUsers() throws Exception {
+     void getUsers_ShouldReturnAllUsers() throws Exception {
         // Arrange
         List<User> userList = Arrays.asList(new User(1L, "userTest1","userTest1pw", "user1@test.com",UserRoles.ADMIN)); // Include role in constructor
         GetAllUsersResponse response = new GetAllUsersResponse(userList);
@@ -80,7 +80,7 @@ import java.util.List;
     @Test
     @WithMockUser(username="admin", roles={"USER", "ADMIN"})
 
-    public void createUser_ShouldReturnCreated() throws Exception {
+     void createUser_ShouldReturnCreated() throws Exception {
         // Arrange
         CreateUserRequest request = new CreateUserRequest("newUser", "newUser@test.com", "password", UserRoles.USER);
         CreateUserResponse response = new CreateUserResponse(1L, "newUser", "newUser@test.com", UserRoles.USER);
@@ -113,7 +113,7 @@ import java.util.List;
     @Test
     @WithMockUser(username="admin", roles={"USER", "ADMIN"})
 
-    public void updateUser_ShouldReturnNoContent() throws Exception {
+     void updateUser_ShouldReturnNoContent() throws Exception {
         // Arrange
         UpdateUserPasswordRequest request = new UpdateUserPasswordRequest(1L, "newPassword");
 
@@ -129,7 +129,7 @@ import java.util.List;
     @Test
     @WithMockUser(username="admin", roles={"USER", "ADMIN"})
 
-    public void deleteUser_ShouldReturnNoContent() throws Exception {
+     void deleteUser_ShouldReturnNoContent() throws Exception {
         // Act & Assert
         mockMvc.perform(delete("/unlimitedmarketplace/{id}", 1L))
                 .andExpect(status().isNoContent());

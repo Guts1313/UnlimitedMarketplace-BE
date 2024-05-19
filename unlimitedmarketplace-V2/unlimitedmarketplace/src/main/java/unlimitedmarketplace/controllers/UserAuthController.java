@@ -50,7 +50,7 @@ public class UserAuthController {
             );
 
             if (authentication == null || !authentication.isAuthenticated()) {
-                logs.info("Authentication failed.");
+                logs.info("%Authentication failed.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
@@ -65,7 +65,7 @@ public class UserAuthController {
             logs.info("Generated JWT: {}" , jwt);
 
             if (jwt == null) {
-                logs.info("JWT is null, check tokenService and key configuration.");
+                logs.info("J%WT is null, %check tokenService and key configuration.");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
 
@@ -73,7 +73,7 @@ public class UserAuthController {
             LoginResponse response = new LoginResponse(jwt, refreshToken, userId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logs.info("Error during authentication: " + e.getMessage());
+            logs.info("Error during authentication: {}" , e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
