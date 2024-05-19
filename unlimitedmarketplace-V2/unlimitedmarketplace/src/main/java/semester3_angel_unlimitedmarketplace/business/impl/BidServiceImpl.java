@@ -57,6 +57,9 @@ public class BidServiceImpl implements BidService {
         }
         return null;
     }
+    public List<String> getAllBiddersExceptLatest(Long productId, String latestBidderUsername) {
+        return bidRepository.findAllBiddersExceptLatest(productId, latestBidderUsername);
+    }
 
     @Override
     public BidEntity placeBid(BidRequest bidRequest) {

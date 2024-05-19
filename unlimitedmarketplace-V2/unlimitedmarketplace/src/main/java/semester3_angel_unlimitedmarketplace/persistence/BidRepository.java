@@ -18,5 +18,7 @@ public interface BidRepository extends JpaRepository<BidEntity, Long> {
     Page<BidEntity> findHighestBidByProductId(@Param("productId") Long productId, Pageable pageable);
     @Query("SELECT b.user.id FROM BidEntity b WHERE b.product.id = :productId AND b.amount < :latestBidAmount")
     List<Long> findUserIdsOfOutbidUsers(@Param("productId") Long productId, @Param("latestBidAmount") BigDecimal latestBidAmount);
+    @Query("SELECT DISTINCT b.user.userName FROM BidEntity b WHERE b.product.id = :productId AND b.user.userName != :latestBidderUsername")
+    List<String> findAllBiddersExceptLatest(@Param("productId") Long productId, @Param("latestBidderUsername") String latestBidderUsername);
 
 }

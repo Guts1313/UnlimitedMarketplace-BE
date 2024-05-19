@@ -58,7 +58,7 @@ public class BidController {
     }
 
     @MessageMapping("/placeBid")
-    public void handleBid(BidRequest bidRequest, SimpMessageHeaderAccessor headerAccessor){
+    public void handleBid(BidRequest bidRequest, SimpMessageHeaderAccessor headerAccessor) {
         try {
             if (bidRequest == null) {
                 throw new IllegalArgumentException("Bid request cannot be null.");
@@ -72,25 +72,26 @@ public class BidController {
 
             BigDecimal latestBidAmount = bid.getAmount();
             Long productId = bid.getProduct().getId();
-
-            BidResponse bidResponse = new BidResponse(productId, latestBidAmount, "success");
+            Principal principal = headerAccessor.getUser();
+            BidResponse bidResponse = new BidResponse(productId, bid.getUser().getId(), latestBidAmount, "success");
             messagingTemplate.convertAndSend("/topic/product" + productId, bidResponse);
 
-            Principal principal = headerAccessor.getUser();
             if (principal != null) {
-                messagingTemplate.convertAndSendToUser(principal.getName(),
-                        "/queue/outbid" + productId,
-                        bidResponse.getBidAmount().toString());
+                String latestBidderUsername = principal.getName();
+
+                // Fetch all users who have placed bids on this product except the latest bidder
+                List<String> allBiddersExceptLatest = bidService.getAllBiddersExceptLatest(productId, latestBidderUsername);
+
+                for (String bidder : allBiddersExceptLatest) {
+                    messagingTemplate.convertAndSendToUser(bidder, "/queue/outbid" + productId, bidResponse.getBidAmount().toString());
+                }
             }
         } catch (Exception e) {
             log.error("Error processing bid: {}", e.getMessage(), e);
             if (headerAccessor.getUser() != null) {
-                messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(),
-                        "/queue/bidResponse", new BidResponse(null, null, "error", e.getMessage()));
+                messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(), "/queue/bidResponse", new BidResponse(null, null, BigDecimal.ONE, e.getMessage()));
             }
         }
-
-
     }
 }
 

@@ -137,12 +137,12 @@ public class UserAuthControllerTest {
 
         when(refreshTokenService.isValid(refreshToken)).thenReturn(true);
         when(refreshTokenService.getUsernameFromRefreshToken(refreshToken)).thenReturn(username);
-        when(userService.getAuthoritiesByUsername(username)).thenReturn(List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        when(userService.getAuthoritiesByUsername(username)).thenReturn(List.of(new SimpleGrantedAuthority(UserRoles.USER.toString())));
 
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority(UserRoles.USER.toString())));
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        when(tokenService.encode(username, List.of(new SimpleGrantedAuthority("ROLE_USER")))).thenReturn(newAccessToken);
+        when(tokenService.encode(username, List.of(new SimpleGrantedAuthority(UserRoles.USER.toString())))).thenReturn(newAccessToken);
         when(refreshTokenService.createRefreshToken(username)).thenReturn(newRefreshToken);
 
         mockMvc.perform(post("/unlimitedmarketplace/auth/refresh-token")

@@ -6,6 +6,7 @@ plugins {
 	id("jacoco")
 }
 
+val sonarSecret = System.getenv("SONAR_LOGIN")
 
 group = "semester3_angel_unlimitedmarketplace"
 version = "0.0.1-SNAPSHOT"
@@ -70,7 +71,7 @@ sonarqube {
 		property("sonar.projectKey", "unlimitedmarketplace_sonar")
 		property("sonar.projectName", "unlimitedmarketplace_sonar")
 		property("sonar.host.url", "http://localhost:9000")
-		property("sonar.login", "sqp_5b08838331b3c75e02deb42791f8c40d7081f695")
+		property("sonar.login", sonarSecret)
 		property("sonar.jacoco.reportPaths", buildDir.resolve("reports/jacoco/test/jacocoTestReport.xml").absolutePath)
 		property("sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
 
