@@ -18,6 +18,7 @@ import unlimitedmarketplace.security.RefreshTokenServiceImpl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/auth")
@@ -27,6 +28,7 @@ public class UserAuthController {
     private final AccessTokenEncoderDecoderImpl tokenService;
     private final RefreshTokenServiceImpl refreshTokenService;
     private final UserService userService; // Added UserService
+//    private static final Logger log = (Logger) LoggerFactory.getLogger(UserAuthController.class);
 
     public UserAuthController(AuthenticationManager authenticationManager, AccessTokenEncoderDecoderImpl tokenService,
                               RefreshTokenServiceImpl refreshTokenService, UserService userService) {
@@ -47,7 +49,7 @@ public class UserAuthController {
             );
 
             if (authentication == null || !authentication.isAuthenticated()) {
-                System.out.println("Authentication failed.");
+//                log.info("Authentication failed.");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
@@ -62,7 +64,7 @@ public class UserAuthController {
             System.out.println("Generated JWT: " + jwt); // Check the JWT output
 
             if (jwt == null) {
-                System.out.println("JWT is null, check tokenService and key configuration.");
+//                log.info("JWT is null, check tokenService and key configuration.");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
 
@@ -70,7 +72,7 @@ public class UserAuthController {
             LoginResponse response = new LoginResponse(jwt, refreshToken,userId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.out.println("Error during authentication: " + e.getMessage());
+//            log.info("Error during authentication: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

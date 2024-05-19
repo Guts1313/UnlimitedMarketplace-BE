@@ -25,7 +25,7 @@ public class ProductController {
     private final CreateProductUseCase createProductUseCase;
     private final GetAllProductsUseCase getAllProducts;
     private final GetProductUseCase getProductUseCase;
-    private static final Logger log = LoggerFactory.getLogger(AccessTokenEncoderDecoderImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @CrossOrigin(origins = "http://localhost:3000")

@@ -1,3 +1,4 @@
+
 plugins {
 	java
 	id("org.springframework.boot") version "3.2.3"
@@ -7,7 +8,12 @@ plugins {
 }
 
 val sonarSecret = System.getenv("SONAR_LOGIN")
-
+val jacocoAgentVersion = "0.8.9";
+val springSecurityWebConfigVersion="6.2.4"
+val springSecurityTestJakartaApiVersion="6.0.0"
+val jsonWebTokenApiJacksonVersion="0.11.5"
+val jakartaXmlJaxbVersion="3.0.1"
+val javaAuthJwt="4.4.0"
 group = "semester3_angel_unlimitedmarketplace"
 version = "0.0.1-SNAPSHOT"
 
@@ -26,7 +32,6 @@ repositories {
 	mavenCentral()
 }
 
-
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -37,23 +42,23 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("com.h2database:h2")
-	implementation("com.auth0:java-jwt:4.4.0")
-	implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
+	implementation("com.auth0:java-jwt:$javaAuthJwt")
+	implementation("io.jsonwebtoken:jjwt-impl:$jsonWebTokenApiJacksonVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
-	runtimeOnly("org.glassfish.jaxb:jaxb-runtime:3.0.1")
-	runtimeOnly("io.jsonwebtoken:jjwt-api:0.11.5")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-	testImplementation("org.jacoco:org.jacoco.agent:0.8.9")
-	implementation("org.springframework.security:spring-security-web:6.2.4")
-	implementation("org.springframework.security:spring-security-config:6.2.4")
-	testImplementation("org.springframework.security:spring-security-test:6.0.0")
-	implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
+	implementation("jakarta.xml.bind:jakarta.xml.bind-api:$jakartaXmlJaxbVersion")
+	runtimeOnly("org.glassfish.jaxb:jaxb-runtime:$jakartaXmlJaxbVersion")
+	runtimeOnly("io.jsonwebtoken:jjwt-api:$jsonWebTokenApiJacksonVersion")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jsonWebTokenApiJacksonVersion")
+	testImplementation("org.jacoco:org.jacoco.agent:$jacocoAgentVersion")
+	implementation("org.springframework.security:spring-security-web:$springSecurityWebConfigVersion")
+	implementation("org.springframework.security:spring-security-config:$springSecurityWebConfigVersion")
+	testImplementation("org.springframework.security:spring-security-test:$springSecurityTestJakartaApiVersion")
+	implementation("jakarta.servlet:jakarta.servlet-api:$springSecurityTestJakartaApiVersion")
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
 
 }
 jacoco {
-	toolVersion = "0.8.9"  // specify the version you want to use
+	toolVersion = jacocoAgentVersion  // specify the version you want to use
 }
 tasks.jacocoTestReport {
 	dependsOn("test")  // ensures that the test task is run before generating the report

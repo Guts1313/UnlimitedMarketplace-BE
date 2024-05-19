@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, AccessTokenDecoder {
     private final Key key;
+    private static final String ROLES  = "roles";
     private static final Logger log = LoggerFactory.getLogger(AccessTokenEncoderDecoderImpl.class);
 
     public AccessTokenEncoderDecoderImpl(@Value("${jwt.secret}") String secretKey) {
@@ -26,7 +27,7 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
     }
     public String encodeAndGetId(String username, Long userId, Collection<? extends GrantedAuthority> authorities) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put("roles", authorities.stream()
+        claims.put(ROLES, authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
         claims.put("id", userId); // Add the user ID to the token
@@ -49,7 +50,7 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
 
     public String encode(String username, Collection<? extends GrantedAuthority> authorities) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put("roles", authorities.stream()
+        claims.put(ROLES, authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 
@@ -82,7 +83,7 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
                     .parseClaimsJws(accessTokenEncoded);
             Claims claims = jwt.getBody();
 
-            List<String> rolesList = claims.get("roles", List.class);
+            List<String> rolesList = claims.get(ROLES, List.class);
             Long userId = claims.get("id", Long.class);
 
             // Directly collect roles without adding the ROLE_ prefix

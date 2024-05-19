@@ -216,10 +216,10 @@ import unlimitedmarketplace.controllers.UserController;
         validator.validate(request, errors);
 
         assertTrue(errors.hasErrors(), "There should be errors for all fields being null");
-        assertTrue(errors.getFieldError("userName") != null);
-        assertTrue(errors.getFieldError("email") != null);
-        assertTrue(errors.getFieldError("passwordHash") != null);
-        assertTrue(errors.getFieldError("role") != null);
+        assertNotNull(errors.getFieldError("userName"));
+        assertNotNull(errors.getFieldError("email"));
+        assertNotNull(errors.getFieldError("passwordHash"));
+        assertNotNull(errors.getFieldError("role"));
     }
 
 

@@ -29,7 +29,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 
     private final AccessTokenEncoderDecoderImpl tokenDecoder;
-    private static final Logger log = LoggerFactory.getLogger(AccessTokenEncoderDecoderImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(StompWebSocketConfig.class);
 
     public StompWebSocketConfig(AccessTokenEncoderDecoderImpl tokenDecoder) {
         this.tokenDecoder = tokenDecoder;
@@ -77,9 +77,9 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private Collection<? extends GrantedAuthority> getAuthorities(Claims claims) {
         List<String> roles = claims.get("roles", List.class);
-        return roles.stream()
+        return List.copyOf(roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.toUpperCase()))
-                .collect(Collectors.toList());
+                .toList());
     }
 
     @Override

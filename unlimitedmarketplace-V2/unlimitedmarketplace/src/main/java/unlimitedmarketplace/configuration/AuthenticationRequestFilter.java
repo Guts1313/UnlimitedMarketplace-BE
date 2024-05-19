@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class AuthenticationRequestFilter extends OncePerRequestFilter {
 
     private static final String SPRING_SECURITY_ROLE_PREFIX = "";
-    private static final Logger log = LoggerFactory.getLogger(AccessTokenEncoderDecoderImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationRequestFilter.class);
 
     @Autowired
     private AccessTokenDecoder accessTokenDecoder;

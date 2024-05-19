@@ -15,7 +15,6 @@ import unlimitedmarketplace.business.*;
 import unlimitedmarketplace.business.exceptions.DuplicateEmailException;
 import unlimitedmarketplace.business.exceptions.DuplicateUsernameException;
 import unlimitedmarketplace.domain.*;
-import unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
 
 @RestController
@@ -27,7 +26,7 @@ public class UserController {
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserPasswordUseCase updateUserPasswordUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
-    private static final Logger log = LoggerFactory.getLogger(AccessTokenEncoderDecoderImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @PreAuthorize("hasRole('USER')")
 
@@ -55,9 +54,7 @@ public class UserController {
         try {
             CreateUserResponse response = createUserUseCase.saveUser(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (DuplicateUsernameException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } catch (DuplicateEmailException ex) {
+        } catch (DuplicateUsernameException | DuplicateEmailException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

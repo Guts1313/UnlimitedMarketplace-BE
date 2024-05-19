@@ -26,7 +26,6 @@ public class BidServiceImpl implements BidService {
     private final BidRepository bidRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private static final Logger log = LoggerFactory.getLogger(BidServiceImpl.class);
 
     public BidServiceImpl(BidRepository bidRepository, ProductRepository productRepository, UserRepository userRepository) {
         this.bidRepository = bidRepository;

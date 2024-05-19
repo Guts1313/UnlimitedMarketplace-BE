@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
         private RefreshTokenServiceImpl refreshTokenService;
 
         @Test
-        public void testCreateRefreshToken() {
+         void testCreateRefreshToken() {
             String username = "user";
             Mockito.when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(i -> i.getArguments()[0]);
 
@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
         }
 
         @Test
-        public void testIsValid() {
+         void testIsValid() {
             RefreshToken token = new RefreshToken();
             token.setToken("token123");
             token.setExpiryDate(Instant.now().plusSeconds(3600)); // 1 hour from now

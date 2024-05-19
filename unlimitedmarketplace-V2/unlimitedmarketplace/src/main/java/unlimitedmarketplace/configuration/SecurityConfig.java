@@ -106,7 +106,7 @@ public class SecurityConfig {
         http.formLogin(fL -> fL.loginPage(LOGIN)
                 .usernameParameter("email").permitAll()
                 .defaultSuccessUrl("/", true)
-                .failureUrl("/login"));
+                .failureUrl(LOGIN));
         http.logout(logOut -> logOut.logoutUrl("/logout")
                 .clearAuthentication(true)
                 .invalidateHttpSession(true)
