@@ -1,16 +1,11 @@
 package semester3_angel_unlimitedmarketplace.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import semester3_angel_unlimitedmarketplace.persistence.RefreshTokenRepository;
 import semester3_angel_unlimitedmarketplace.persistence.entity.RefreshToken;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class RefreshTokenServiceImpl {

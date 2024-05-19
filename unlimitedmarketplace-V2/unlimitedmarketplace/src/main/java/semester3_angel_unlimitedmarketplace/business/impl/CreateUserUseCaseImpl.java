@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import semester3_angel_unlimitedmarketplace.business.CreateUserUseCase;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateEmailException;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateUsernameException;
-import semester3_angel_unlimitedmarketplace.domain.UserRoles;
 import semester3_angel_unlimitedmarketplace.persistence.UserRepository;
 import semester3_angel_unlimitedmarketplace.domain.CreateUserRequest;
 import semester3_angel_unlimitedmarketplace.domain.CreateUserResponse;

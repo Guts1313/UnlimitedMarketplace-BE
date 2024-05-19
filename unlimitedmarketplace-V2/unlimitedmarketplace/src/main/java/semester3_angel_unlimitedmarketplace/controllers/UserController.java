@@ -1,6 +1,5 @@
 package semester3_angel_unlimitedmarketplace.controllers;
 
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -18,7 +17,6 @@ import semester3_angel_unlimitedmarketplace.business.customexceptions.DuplicateU
 import semester3_angel_unlimitedmarketplace.domain.*;
 import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace")

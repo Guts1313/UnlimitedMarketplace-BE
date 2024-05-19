@@ -1,6 +1,5 @@
 package semester3_angel_unlimitedmarketplace.business.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,11 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import semester3_angel_unlimitedmarketplace.persistence.UserRepository;
 import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
-
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

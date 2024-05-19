@@ -6,8 +6,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import semester3_angel_unlimitedmarketplace.persistence.UserRepository;
 import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
-
-import java.util.Arrays;
 import java.util.List;
 
 @Service

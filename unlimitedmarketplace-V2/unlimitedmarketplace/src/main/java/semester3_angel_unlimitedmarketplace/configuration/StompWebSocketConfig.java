@@ -1,13 +1,10 @@
 package semester3_angel_unlimitedmarketplace.configuration;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -19,8 +16,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
-import org.springframework.web.util.UriComponentsBuilder;
-import semester3_angel_unlimitedmarketplace.controllers.BidController;
 import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
 import java.security.Principal;

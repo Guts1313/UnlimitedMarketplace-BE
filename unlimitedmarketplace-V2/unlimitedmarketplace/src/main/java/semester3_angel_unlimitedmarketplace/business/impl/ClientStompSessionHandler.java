@@ -5,10 +5,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import semester3_angel_unlimitedmarketplace.controllers.BidController;
-import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
-import java.util.logging.Logger;
 
 public class ClientStompSessionHandler extends StompSessionHandlerAdapter {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ClientStompSessionHandler.class);

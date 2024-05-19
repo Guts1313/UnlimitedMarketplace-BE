@@ -1,26 +1,17 @@
 package semester3_angel_unlimitedmarketplace.controllers;
 
-import io.jsonwebtoken.Claims;
-import jakarta.persistence.Convert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import semester3_angel_unlimitedmarketplace.business.BidService;
 import semester3_angel_unlimitedmarketplace.domain.BidRequest;
 import semester3_angel_unlimitedmarketplace.domain.BidResponse;
-import semester3_angel_unlimitedmarketplace.domain.OutbidNotification;
 import semester3_angel_unlimitedmarketplace.persistence.entity.BidEntity;
-import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
 import java.math.BigDecimal;
 import java.security.Principal;

@@ -5,9 +5,7 @@ import semester3_angel_unlimitedmarketplace.business.GetUserUseCase;
 import semester3_angel_unlimitedmarketplace.business.customexceptions.UserNotFoundException;
 import semester3_angel_unlimitedmarketplace.persistence.UserRepository;
 import semester3_angel_unlimitedmarketplace.domain.GetUserResponse;
-import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
 
-import java.util.Optional;
 
 @Service
 

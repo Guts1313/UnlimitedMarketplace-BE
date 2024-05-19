@@ -1,16 +1,13 @@
 package semester3_angel_unlimitedmarketplace.business.impl;
 
-import jakarta.persistence.Convert;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import semester3_angel_unlimitedmarketplace.business.BidService;
 import semester3_angel_unlimitedmarketplace.domain.BidRequest;
-import semester3_angel_unlimitedmarketplace.domain.User;
 import semester3_angel_unlimitedmarketplace.persistence.BidRepository;
 import semester3_angel_unlimitedmarketplace.persistence.ProductRepository;
 import semester3_angel_unlimitedmarketplace.persistence.UserRepository;

@@ -1,9 +1,7 @@
 package semester3_angel_unlimitedmarketplace.business.impl;
 
 
-import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 import semester3_angel_unlimitedmarketplace.business.CreateProductUseCase;
 import semester3_angel_unlimitedmarketplace.domain.CreateProductRequest;
 import semester3_angel_unlimitedmarketplace.domain.CreateProductResponse;

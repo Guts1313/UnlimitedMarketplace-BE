@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import semester3_angel_unlimitedmarketplace.persistence.ProductRepository;
 
 @Data
 @AllArgsConstructor

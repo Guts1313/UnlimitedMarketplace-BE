@@ -1,11 +1,9 @@
 package semester3_angel_unlimitedmarketplace.controllers;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,14 +14,10 @@ import semester3_angel_unlimitedmarketplace.domain.*;
 import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
 import semester3_angel_unlimitedmarketplace.security.AccessToken;
 import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
-import semester3_angel_unlimitedmarketplace.security.AccessTokenImpl;
 import semester3_angel_unlimitedmarketplace.security.RefreshTokenServiceImpl;
-import semester3_angel_unlimitedmarketplace.util.JwtUtil;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/auth")

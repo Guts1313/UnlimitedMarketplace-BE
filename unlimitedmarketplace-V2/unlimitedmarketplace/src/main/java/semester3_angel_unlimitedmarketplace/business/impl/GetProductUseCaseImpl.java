@@ -3,7 +3,6 @@ package semester3_angel_unlimitedmarketplace.business.impl;
 
 import org.springframework.stereotype.Service;
 import semester3_angel_unlimitedmarketplace.business.GetProductUseCase;
-import semester3_angel_unlimitedmarketplace.domain.GetAllProductsResponse;
 import semester3_angel_unlimitedmarketplace.domain.GetProductRequest;
 import semester3_angel_unlimitedmarketplace.domain.GetProductResponse;
 import semester3_angel_unlimitedmarketplace.persistence.ProductRepository;
