@@ -33,14 +33,13 @@ public class BidController {
     }
 
     @GetMapping("/latest/{productId}")
-    public ResponseEntity<?> getLatestBid(@PathVariable Long productId) {
+    public ResponseEntity<BidResponse> getLatestBid(@PathVariable Long productId) {
         try {
             BigDecimal latestBidAmount = bidService.findLatestBidAmountByProductId(productId);
             return ResponseEntity.ok(new BidResponse(productId, latestBidAmount, "success"));
         } catch (Exception e) {
             log.error("Failed to fetch latest bid: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to fetch latest bid");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

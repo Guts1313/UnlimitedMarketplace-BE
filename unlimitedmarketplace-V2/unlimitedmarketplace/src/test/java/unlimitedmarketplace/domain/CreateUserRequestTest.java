@@ -23,7 +23,7 @@ import unlimitedmarketplace.business.exceptions.DuplicateUsernameException;
 import unlimitedmarketplace.controllers.UserController;
 
 @ExtendWith(MockitoExtension.class)
-public class CreateUserRequestTest {
+ class CreateUserRequestTest {
     @Mock
     private CreateUserUseCase createUserUseCase;
 

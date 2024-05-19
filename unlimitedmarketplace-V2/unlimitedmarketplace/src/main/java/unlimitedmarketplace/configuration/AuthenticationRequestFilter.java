@@ -59,7 +59,7 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } catch (Exception e) {
             logger.error("Error validating access token", e);
-            sendAuthenticationError(response, "Invalid JWT: " + e.getMessage());
+            sendAuthenticationError(response, "Invalid JWT: {}" + e.getMessage());
         }
     }
 
@@ -78,7 +78,7 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
                 .collect(Collectors.toList());
 
         UserDetails userDetails = new User(accessToken.getSubject(), "", grantedAuthorities);
-        log.info("User Authorities in Security Context: " + userDetails.getAuthorities());
+        log.info("User Authorities in Security Context: {}" , userDetails.getAuthorities());
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, grantedAuthorities);

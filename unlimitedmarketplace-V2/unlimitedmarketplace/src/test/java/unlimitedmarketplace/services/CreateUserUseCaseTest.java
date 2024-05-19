@@ -1,7 +1,7 @@
 package unlimitedmarketplace.services;
 
 
-public class CreateUserUseCaseTest {
+ class CreateUserUseCaseTest {
 
 
 }

@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @Profile("test") // Ensures this configuration is only active when the "test" profile is used
-public class TestsSecurityConfig {
+ class TestsSecurityConfig {
 
     @Bean
     public SecurityFilterChain disableSecurity(HttpSecurity http) throws Exception {

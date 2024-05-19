@@ -24,7 +24,7 @@ import java.util.List;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")  // Ensure this profile configures the necessary beans and settings for tests
 
-public class UserControllerTest {
+ class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

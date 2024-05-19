@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
-    public class RefreshTokenServiceImplTest {
+     class RefreshTokenServiceImplTest {
 
         @MockBean
         private RefreshTokenRepository refreshTokenRepository;

@@ -46,7 +46,7 @@ public class ProductController {
         GetAllProductsRequest request = GetAllProductsRequest.builder().productsCat(productCat).build();
         GetAllProductsResponse response = getAllProducts.getAllProducts(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Authenticated user: " + auth.getName() + " with roles: " + auth.getAuthorities());
+        log.info("Authenticated user: {}" , auth.getName() + " with roles: {}" + auth.getAuthorities());
         return ResponseEntity.ok(response);
     }
 
@@ -59,8 +59,6 @@ public class ProductController {
             GetProductRequest request = new GetProductRequest();
             request.setId(id);
             response = getProductUseCase.getProduct(request);
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            // Optionally use auth object for further logic if needed
         } catch (Exception error) {
             // Log the error or handle it as necessary
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Return an appropriate error response

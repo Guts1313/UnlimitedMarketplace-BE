@@ -31,9 +31,6 @@ public class RefreshTokenServiceImpl {
                 .orElse(false);
     }
 
-    public void deleteRefreshToken(String token) {
-        refreshTokenRepository.deleteByToken(token);
-    }
     public String getUsernameFromRefreshToken(String token) {
         return refreshTokenRepository.findByToken(token)
                 .map(RefreshToken::getUsername)

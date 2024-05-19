@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")  // Ensure this profile configures the necessary beans and settings for tests
-public class UserAuthControllerTest {
+ class UserAuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

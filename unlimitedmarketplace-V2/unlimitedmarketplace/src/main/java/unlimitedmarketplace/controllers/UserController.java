@@ -45,7 +45,7 @@ public class UserController {
         GetAllUsersResponse response = getUsersUseCase.getAllUsers(request);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Authenticated user: " + auth.getName() + " with roles: " + auth.getAuthorities());
+        log.info("Authenticated user: {}" , auth.getName() + " with roles: " + auth.getAuthorities());
         return ResponseEntity.ok(response);
     }
 //    @PreAuthorize("hasRole('USER')")

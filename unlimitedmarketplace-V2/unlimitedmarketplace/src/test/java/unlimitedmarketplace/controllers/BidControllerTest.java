@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BidControllerTest {
+ class BidControllerTest {
 
     @Mock
     private SimpMessagingTemplate messagingTemplate;
@@ -69,7 +69,7 @@ public class BidControllerTest {
         ResponseEntity<?> response = bidController.getLatestBid(productId);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Failed to fetch latest bid", response.getBody());
+        assertEquals(null, response.getBody());
     }
 
 
