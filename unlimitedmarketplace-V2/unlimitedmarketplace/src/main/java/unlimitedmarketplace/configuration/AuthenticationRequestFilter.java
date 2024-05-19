@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import unlimitedmarketplace.security.AccessToken;
 import unlimitedmarketplace.security.AccessTokenDecoder;
-import unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
 
 import java.io.IOException;
 import java.util.List;
