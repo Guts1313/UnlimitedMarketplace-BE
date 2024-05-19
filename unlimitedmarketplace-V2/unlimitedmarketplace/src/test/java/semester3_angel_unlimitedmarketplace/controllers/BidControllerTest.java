@@ -6,10 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -17,9 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import semester3_angel_unlimitedmarketplace.business.BidService;
 import semester3_angel_unlimitedmarketplace.domain.BidRequest;
 import semester3_angel_unlimitedmarketplace.domain.BidResponse;
-import semester3_angel_unlimitedmarketplace.persistence.BidRepository;
-import semester3_angel_unlimitedmarketplace.persistence.ProductRepository;
-import semester3_angel_unlimitedmarketplace.persistence.UserRepository;
+
 import semester3_angel_unlimitedmarketplace.persistence.entity.BidEntity;
 import semester3_angel_unlimitedmarketplace.persistence.entity.ProductEntity;
 import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
@@ -27,7 +21,6 @@ import semester3_angel_unlimitedmarketplace.persistence.entity.UserEntity;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,17 +31,21 @@ public class BidControllerTest {
 
     @Mock
     private SimpMessagingTemplate messagingTemplate;
-
+    private SimpMessageHeaderAccessor headerAccessor;
     @Mock
     private BidService bidService;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private BidRepository bidRepository;
-    @Mock
-    private ProductRepository productRepository;
     @InjectMocks
     private BidController bidController;
+
+//    @BeforeEach
+//    void setUp() {
+//        Principal principal = mock(Principal.class);
+//        when(principal.getName()).thenReturn("user1");
+//
+//        headerAccessor = mock(SimpMessageHeaderAccessor.class);
+//        when(headerAccessor.getUser()).thenReturn(principal);
+//    }
+
 
     @Test
     void testGetLatestBidSuccess() {
@@ -60,9 +57,10 @@ public class BidControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody() instanceof BidResponse);
+        assertInstanceOf(BidResponse.class, response.getBody());
         assertEquals(bidAmount, ((BidResponse) response.getBody()).getBidAmount());
     }
+
 
     @Test
     void testGetLatestBidFailure() {
@@ -75,35 +73,44 @@ public class BidControllerTest {
         assertEquals("Failed to fetch latest bid", response.getBody());
     }
 
+
     @Test
     void testHandleBidSuccess() {
         // Setup request and entity objects
         BidRequest bidRequest = new BidRequest(1L, 2L, new BigDecimal("200.00"));
         BidEntity bidEntity = new BidEntity();
         bidEntity.setAmount(new BigDecimal("200.00"));
+        bidEntity.setId(2L);
+
+        // Set up ProductEntity
         ProductEntity product = new ProductEntity();
         product.setId(1L);
         bidEntity.setProduct(product);
 
+        // Set up UserEntity and associate it with BidEntity
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(2L);
+        userEntity.setUserName("user1");
+        bidEntity.setUser(userEntity);
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("user1");
+
+        headerAccessor = mock(SimpMessageHeaderAccessor.class);
+        when(headerAccessor.getUser()).thenReturn(principal);
         // Mock the service to return the prepared entity
         when(bidService.placeBid(bidRequest)).thenReturn(bidEntity);
+        when(bidService.getAllBiddersExceptLatest(anyLong(), anyString())).thenReturn(Collections.singletonList("user2"));
 
         // Mock messaging template to do nothing when methods are called
         doNothing().when(messagingTemplate).convertAndSend(anyString(), any(BidResponse.class));
         doNothing().when(messagingTemplate).convertAndSendToUser(anyString(), anyString(), anyString());
-
-        // Prepare and mock the header accessor
-        SimpMessageHeaderAccessor headerAccessor = mock(SimpMessageHeaderAccessor.class);
-        Principal mockPrincipal = mock(Principal.class);
-        when(mockPrincipal.getName()).thenReturn("user1");
-        when(headerAccessor.getUser()).thenReturn(mockPrincipal);
 
         // Call the method under test
         bidController.handleBid(bidRequest, headerAccessor);
 
         // Verify interactions
         verify(messagingTemplate).convertAndSend(eq("/topic/product1"), any(BidResponse.class));
-        verify(messagingTemplate).convertAndSendToUser(eq("user1"), eq("/queue/outbid1"), anyString());
+        verify(messagingTemplate).convertAndSendToUser(eq("user2"), eq("/queue/outbid1"), anyString());
     }
 
 
@@ -111,9 +118,11 @@ public class BidControllerTest {
     void testHandleBidFailure() {
         BidRequest bidRequest = new BidRequest(1L, 2L, new BigDecimal("200.00"));
         when(bidService.placeBid(bidRequest)).thenThrow(new RuntimeException("Database error"));
-        SimpMessageHeaderAccessor headerAccessor = mock(SimpMessageHeaderAccessor.class);
-        when(headerAccessor.getUser()).thenReturn(() -> "user1");
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("user1");
 
+        headerAccessor = mock(SimpMessageHeaderAccessor.class);
+        when(headerAccessor.getUser()).thenReturn(principal);
         bidController.handleBid(bidRequest, headerAccessor);
 
         verify(messagingTemplate, times(1)).convertAndSendToUser(eq("user1"), eq("/queue/bidResponse"), any(BidResponse.class));
@@ -122,23 +131,38 @@ public class BidControllerTest {
 
     @Test
     void testHandleBidWithUnauthenticatedUser() {
+        // Create the BidRequest
         BidRequest bidRequest = new BidRequest(1L, 2L, new BigDecimal("200.00"));
-        SimpMessageHeaderAccessor headerAccessor = mock(SimpMessageHeaderAccessor.class);
-        when(headerAccessor.getUser()).thenReturn(null);  // Unauthenticated user
 
+        // Mock SimpMessageHeaderAccessor to return null for getUser
+        SimpMessageHeaderAccessor headerAccessor = mock(SimpMessageHeaderAccessor.class);
+        when(headerAccessor.getUser()).thenReturn(null);
+
+        // Ensure a valid bid is returned from the bidService
+        when(bidService.placeBid(bidRequest)).thenReturn(new BidEntity());
+
+        // Call the handleBid method
         bidController.handleBid(bidRequest, headerAccessor);
 
+        // Verify that messagingTemplate.convertAndSendToUser is never called
         verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), any());
     }
+
 
     @Test
     void testHandleMaxIntegerBidAmount() {
         BidRequest bidRequest = new BidRequest(1L, 2L, new BigDecimal(Integer.MAX_VALUE));
         BidEntity bidEntity = new BidEntity();
         bidEntity.setAmount(new BigDecimal(Integer.MAX_VALUE));
+
         ProductEntity product = new ProductEntity();
         product.setId(1L);
         bidEntity.setProduct(product);
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(2L);
+        userEntity.setUserName("user1");
+        bidEntity.setUser(userEntity);
 
         when(bidService.placeBid(bidRequest)).thenReturn(bidEntity);
 
@@ -147,19 +171,22 @@ public class BidControllerTest {
         verify(messagingTemplate).convertAndSend(eq("/topic/product1"), any(BidResponse.class));
     }
 
-
     @Test
     void testHandleBidFailureDueToNullBid() {
-        // Arrange: Simulate bid creation failure
-        when(bidService.placeBid(any())).thenReturn(null);
+        // Mock SimpMessageHeaderAccessor
         SimpMessageHeaderAccessor headerAccessor = mock(SimpMessageHeaderAccessor.class);
 
-        // Act and Assert: Expect IllegalStateException due to null bid
-        BidRequest bidRequest = new BidRequest(1L, 2L, new BigDecimal("200"));
-        IllegalStateException exception = new IllegalStateException();
-        bidController.handleBid(bidRequest, headerAccessor);
-        assertEquals(new IllegalStateException().getMessage(), exception.getMessage());
+        // Verify that the exception was thrown
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            bidController.handleBid(null, headerAccessor);
+        });
+
+        assertEquals("Bid request cannot be null.", exception.getMessage());
+
+        // Verify that messagingTemplate.convertAndSend is never called
+        verify(messagingTemplate, never()).convertAndSend(anyString(), any(BidResponse.class));
     }
+
 
 //    @Test
 //    void testPlaceBidSuccessfullyHigherThanCurrent() {

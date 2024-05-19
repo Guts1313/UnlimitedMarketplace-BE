@@ -1,6 +1,7 @@
 package semester3_angel_unlimitedmarketplace.controllers;
 
 import io.jsonwebtoken.Claims;
+import jakarta.persistence.Convert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,9 @@ import semester3_angel_unlimitedmarketplace.security.AccessTokenEncoderDecoderIm
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/bids")
@@ -59,39 +62,57 @@ public class BidController {
 
     @MessageMapping("/placeBid")
     public void handleBid(BidRequest bidRequest, SimpMessageHeaderAccessor headerAccessor) {
-        try {
-            if (bidRequest == null) {
-                throw new IllegalArgumentException("Bid request cannot be null.");
-            }
+        if (bidRequest == null) {
+            throw new IllegalArgumentException("Bid request cannot be null.");
+        }
 
+        if (headerAccessor == null) {
+            throw new IllegalArgumentException("Header accessor cannot be null.");
+        }
+
+        try {
             BidEntity bid = bidService.placeBid(bidRequest);
 
             if (bid == null) {
                 throw new IllegalStateException("Bid creation failed, no bid returned.");
             }
 
+            if (bid.getProduct() == null || bid.getProduct().getId() == null) {
+                throw new IllegalStateException("Bid product or product ID is null.");
+            }
+
             BigDecimal latestBidAmount = bid.getAmount();
             Long productId = bid.getProduct().getId();
             Principal principal = headerAccessor.getUser();
+
+            if (bid.getUser() == null || bid.getUser().getId() == null) {
+                throw new IllegalStateException("Bid user or user ID is null.");
+            }
+
             BidResponse bidResponse = new BidResponse(productId, bid.getUser().getId(), latestBidAmount, "success");
             messagingTemplate.convertAndSend("/topic/product" + productId, bidResponse);
 
             if (principal != null) {
                 String latestBidderUsername = principal.getName();
-
-                // Fetch all users who have placed bids on this product except the latest bidder
                 List<String> allBiddersExceptLatest = bidService.getAllBiddersExceptLatest(productId, latestBidderUsername);
 
-                for (String bidder : allBiddersExceptLatest) {
-                    messagingTemplate.convertAndSendToUser(bidder, "/queue/outbid" + productId, bidResponse.getBidAmount().toString());
+                // Ensure we only send unique notifications to each user
+                Set<String> uniqueBidders = new HashSet<>(allBiddersExceptLatest);
+                for (String bidder : uniqueBidders) {
+                    messagingTemplate.convertAndSendToUser(bidder, "/queue/outbid" + productId, latestBidAmount.toString());
                 }
             }
         } catch (Exception e) {
             log.error("Error processing bid: {}", e.getMessage(), e);
-            if (headerAccessor.getUser() != null) {
+            if (headerAccessor != null && headerAccessor.getUser() != null) {
                 messagingTemplate.convertAndSendToUser(headerAccessor.getUser().getName(), "/queue/bidResponse", new BidResponse(null, null, BigDecimal.ONE, e.getMessage()));
+            } else {
+                log.error("Header accessor or user is null: Cannot send error response to user.");
             }
         }
     }
+
+
 }
+
 
