@@ -10,6 +10,7 @@ public interface AccessToken {
     Set<String> getRoles();
 
     boolean hasRole(String roleName);
+
 }
 
 

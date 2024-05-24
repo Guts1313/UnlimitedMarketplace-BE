@@ -11,7 +11,6 @@ public class AccessTokenImpl implements AccessToken{
     private final String subject;
     private final Long userId;
     private final Set<String> roles;
-
     public AccessTokenImpl(String subject, Long studentId, Set<String> roles) {
         this.subject = subject;
         this.userId = studentId;

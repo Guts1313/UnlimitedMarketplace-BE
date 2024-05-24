@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserEntity user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getUserRole(user.getId()).name());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name());
 
         return User.builder()
                 .username(user.getUserName())

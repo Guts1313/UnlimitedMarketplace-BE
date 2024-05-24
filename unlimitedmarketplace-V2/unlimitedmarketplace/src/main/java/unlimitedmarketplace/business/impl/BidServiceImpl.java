@@ -1,13 +1,13 @@
 package unlimitedmarketplace.business.impl;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import unlimitedmarketplace.business.BidService;
 import unlimitedmarketplace.domain.BidRequest;
+import unlimitedmarketplace.domain.GetMyBiddedProductsRequest;
+import unlimitedmarketplace.domain.GetMyBiddedProductsResponse;
 import unlimitedmarketplace.persistence.BidRepository;
 import unlimitedmarketplace.persistence.ProductRepository;
 import unlimitedmarketplace.persistence.UserRepository;
@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 
 @Service
@@ -32,6 +33,27 @@ public class BidServiceImpl implements BidService {
         this.productRepository = productRepository;
         this.userRepository = userRepository;
     }
+
+    public GetMyBiddedProductsResponse findBiddedProductsById(GetMyBiddedProductsRequest request) {
+
+//        List<ProductEntity> productEntities = bidRepository.findProductsByUserId(request.getUserId());
+//        for (ProductEntity prod: productEntities){
+//            Long prodId = prod.getId();
+//            BigDecimal latestPrice = findLatestBidAmountByProductId(prodId);
+//            prod.setProductPrice(latestPrice.doubleValue());
+//        }
+//        return GetMyBiddedProductsResponse.builder()
+//                .userBidProducts(productEntities)
+//                .userId(request.getUserId())
+//                .build();
+        Long id = request.getUserId();
+        List<BidEntity> userBidProducts = bidRepository.findBiddedProductsByUserId(id);
+        GetMyBiddedProductsResponse response = new GetMyBiddedProductsResponse();
+        response.setUserId(id);
+        response.setUserBidProducts(userBidProducts);
+        return response;
+    }
+
     public BigDecimal findLatestBidAmountByProductId(Long productId) {
         Pageable pageable = PageRequest.of(0, 1); // Get only the first result
         Page<BidEntity> page = bidRepository.findHighestBidByProductId(productId, pageable);
@@ -42,17 +64,11 @@ public class BidServiceImpl implements BidService {
             return BigDecimal.ZERO; // Return ZERO if no bids are present
         }
     }
-    public List<Long> findPotentiallyOutbidUserIds(Long productId, BigDecimal latestBidAmount) {
-        return bidRepository.findUserIdsOfOutbidUsers(productId, latestBidAmount);
+
+    public List<ProductEntity> findProductsByUserId(Long userId) {
+        return bidRepository.findProductsByUserId(userId);
     }
 
-    public BidEntity findSecondHighestBid(Long productId) {
-        Page<BidEntity> bids = bidRepository.findHighestBidByProductId(productId, PageRequest.of(0, 2));
-        if (bids.hasContent() && bids.getContent().size() > 1) {
-            return bids.getContent().get(1); // get the second highest bid
-        }
-        return null;
-    }
     public List<String> getAllBiddersExceptLatest(Long productId, String latestBidderUsername) {
         return bidRepository.findAllBiddersExceptLatest(productId, latestBidderUsername);
     }
@@ -83,7 +99,6 @@ public class BidServiceImpl implements BidService {
 
         return bidRepository.save(newBid);
     }
-
 
 
 }

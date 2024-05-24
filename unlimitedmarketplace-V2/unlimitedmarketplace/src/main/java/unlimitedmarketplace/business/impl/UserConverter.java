@@ -11,6 +11,6 @@ final class UserConverter {
     public static User convert(UserEntity entity) {
         return User.builder().id(entity.getId()).userName(entity.getUserName())
                 .email(entity.getEmail())
-                .passwordHash(entity.getPasswordHash()).role(entity.getUserRole(entity.getId())).build();
+                .passwordHash(entity.getPasswordHash()).role(entity.getUserRole()).build();
     }
 }

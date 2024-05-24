@@ -31,9 +31,6 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
                 .map(GrantedAuthority::getAuthority)
                 .toList()));
         claims.put("id", userId); // Add the user ID to the token
-
-
-
         Instant now = Instant.now();
         try {
             String token = Jwts.builder()

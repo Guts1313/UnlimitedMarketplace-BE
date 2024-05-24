@@ -9,8 +9,11 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import unlimitedmarketplace.business.BidService;
+import unlimitedmarketplace.business.SubscriptionService;
 import unlimitedmarketplace.domain.BidRequest;
 import unlimitedmarketplace.domain.BidResponse;
+import unlimitedmarketplace.domain.GetMyBiddedProductsRequest;
+import unlimitedmarketplace.domain.GetMyBiddedProductsResponse;
 import unlimitedmarketplace.persistence.entity.BidEntity;
 
 import java.math.BigDecimal;
@@ -21,16 +24,20 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/bids")
+@CrossOrigin(origins = "http://localhost:3000") // Allow cross-origin requests from the frontend
+
 public class BidController {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final BidService bidService;
     private static final Logger log = LoggerFactory.getLogger(BidController.class);
-
-    public BidController(SimpMessagingTemplate messagingTemplate, BidService bidService) {
+    private final SubscriptionService subscriptionService;
+    public BidController(SimpMessagingTemplate messagingTemplate, BidService bidService, SubscriptionService subscriptionService) {
         this.messagingTemplate = messagingTemplate;
         this.bidService = bidService;
+        this.subscriptionService = subscriptionService;
     }
+
 
     @GetMapping("/latest/{productId}")
     public ResponseEntity<BidResponse> getLatestBid(@PathVariable Long productId) {
@@ -49,6 +56,7 @@ public class BidController {
         // Actual notifications will be sent from elsewhere in the application logic
 
     }
+
 
     @MessageMapping("/placeBid")
     public void handleBid(BidRequest bidRequest, SimpMessageHeaderAccessor headerAccessor) {
@@ -73,23 +81,31 @@ public class BidController {
 
             BigDecimal latestBidAmount = bid.getAmount();
             Long productId = bid.getProduct().getId();
+            Long userId = bid.getUser().getId();
             Principal principal = headerAccessor.getUser();
 
-            if (bid.getUser() == null || bid.getUser().getId() == null) {
-                throw new IllegalStateException("Bid user or user ID is null.");
+            if (userId == null) {
+                throw new IllegalStateException("Bid user ID is null.");
             }
 
-            BidResponse bidResponse = new BidResponse(productId, bid.getUser().getId(), latestBidAmount, "success");
+            BidResponse bidResponse = new BidResponse(productId, userId, latestBidAmount, "success");
+            subscriptionService.addUserSubscription(userId, "/topic/product" + productId);
+            subscriptionService.addUserSubscription(userId, "/queue/outbid" + productId);
+
             messagingTemplate.convertAndSend("/topic/product" + productId, bidResponse);
+
+            // Get the latest bid details
+            BigDecimal highestBidAmount = bidService.findLatestBidAmountByProductId(productId);
 
             if (principal != null) {
                 String latestBidderUsername = principal.getName();
                 List<String> allBiddersExceptLatest = bidService.getAllBiddersExceptLatest(productId, latestBidderUsername);
 
-                // Ensure we only send unique notifications to each user
                 Set<String> uniqueBidders = new HashSet<>(allBiddersExceptLatest);
                 for (String bidder : uniqueBidders) {
-                    messagingTemplate.convertAndSendToUser(bidder, "/queue/outbid" + productId, latestBidAmount.toString());
+                    if (!bidder.equals(latestBidderUsername)) { // Avoid self-notification
+                        messagingTemplate.convertAndSendToUser(bidder, "/queue/outbid" + productId, highestBidAmount.toString());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -101,6 +117,23 @@ public class BidController {
             }
         }
     }
+
+
+    @GetMapping("/user-bids/{userId}")
+    public ResponseEntity<GetMyBiddedProductsResponse> getUserBids(@PathVariable Long userId) {
+        try {
+            GetMyBiddedProductsRequest request = GetMyBiddedProductsRequest.builder().userId(userId).build();
+
+            GetMyBiddedProductsResponse userBidProducts = bidService.findBiddedProductsById(request);
+
+            return ResponseEntity.ok(userBidProducts);
+        } catch (Exception e) {
+            log.error("Failed to fetch user bids: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
 
 
 }

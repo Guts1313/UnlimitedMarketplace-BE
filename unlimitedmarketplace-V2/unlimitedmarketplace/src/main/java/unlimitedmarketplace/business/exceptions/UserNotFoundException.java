@@ -5,7 +5,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class UserNotFoundException extends ResponseStatusException {
 
-    public UserNotFoundException(final Long id) {
+    public UserNotFoundException(  ) {
         super(HttpStatus.NOT_FOUND,"USER_NOT_FOUND");
     }
 }

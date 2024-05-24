@@ -16,7 +16,7 @@ public class DeleteUserUseCaseImpl implements DeleteUserUseCase {
     @Override
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException();
         }
         userRepository.deleteById(id);
     }

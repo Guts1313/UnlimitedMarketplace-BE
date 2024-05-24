@@ -3,6 +3,7 @@ package unlimitedmarketplace.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/auth")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserAuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -40,6 +42,8 @@ public class UserAuthController {
     }
 
     @PostMapping("/login")
+    @CrossOrigin(origins = "http://localhost:3000")
+
     public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -77,8 +81,6 @@ public class UserAuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody Map<String, String> body) {
         String refreshToken = body.get("refreshToken");
@@ -88,17 +90,23 @@ public class UserAuthController {
 
         try {
             String username = refreshTokenService.getUsernameFromRefreshToken(refreshToken);
+            UserEntity user = userService.findByUsername(username);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
             List<SimpleGrantedAuthority> authorities = userService.getAuthoritiesByUsername(username);
-
+            // Authenticate with the new authorities
             Authentication newAuth = new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-            String newAccessToken = tokenService.encode(newAuth.getName(), authorities);
-            String newRefreshToken = refreshTokenService.createRefreshToken(username);  // Rotate the refresh token
+            Long userId = user.getId();
+            String newAccessToken = tokenService.encodeAndGetId(newAuth.getName(), userId, newAuth.getAuthorities());
+            String newRefreshToken = refreshTokenService.createRefreshToken(username);  // Optionally rotate the refresh token
 
             return ResponseEntity.ok(new AuthResponse(newAccessToken, newRefreshToken));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 }

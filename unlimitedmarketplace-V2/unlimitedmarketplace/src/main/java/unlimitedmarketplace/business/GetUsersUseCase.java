@@ -6,4 +6,5 @@ import unlimitedmarketplace.domain.GetAllUsersResponse;
 
 public interface GetUsersUseCase {
     GetAllUsersResponse getAllUsers(GetAllUsersRequest request);
+    GetAllUsersResponse getAll();
 }

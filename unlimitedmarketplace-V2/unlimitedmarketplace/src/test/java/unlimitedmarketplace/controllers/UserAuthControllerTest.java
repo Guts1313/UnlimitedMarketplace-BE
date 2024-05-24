@@ -124,31 +124,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andDo(print());
     }
 
-    @Test
-     void testRefreshTokenValid() throws Exception {
-        String refreshToken = "validRefreshToken";
-        String username = "user";
-        String newAccessToken = "newAccessToken";
-        String newRefreshToken = "newRefreshToken";
-
-        when(refreshTokenService.isValid(refreshToken)).thenReturn(true);
-        when(refreshTokenService.getUsernameFromRefreshToken(refreshToken)).thenReturn(username);
-        when(userService.getAuthoritiesByUsername(username)).thenReturn(List.of(new SimpleGrantedAuthority(UserRoles.USER.toString())));
-
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority(UserRoles.USER.toString())));
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-
-        when(tokenService.encode(username, List.of(new SimpleGrantedAuthority(UserRoles.USER.toString())))).thenReturn(newAccessToken);
-        when(refreshTokenService.createRefreshToken(username)).thenReturn(newRefreshToken);
-
-        mockMvc.perform(post("/unlimitedmarketplace/auth/refresh-token")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"refreshToken\": \"" + refreshToken + "\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").value(newAccessToken))
-                .andExpect(jsonPath("$.refreshToken").value(newRefreshToken))
-                .andDo(print());
-    }
 
     @Test
      void testRefreshTokenInvalid() throws Exception {

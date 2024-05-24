@@ -64,7 +64,7 @@ public class UserController {
     @PreAuthorize("hasRole('USER')")
     @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
     @PutMapping("{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable("id") long id,
+    public ResponseEntity<Void> updateUser(@PathVariable(value = "id") long id,
                                            @RequestBody @Valid UpdateUserPasswordRequest request){
 
         request.setId(id);

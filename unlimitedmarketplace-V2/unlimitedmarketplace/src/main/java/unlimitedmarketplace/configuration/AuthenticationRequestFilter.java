@@ -30,8 +30,11 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
     private static final String SPRING_SECURITY_ROLE_PREFIX = "";
     private static final Logger log = LoggerFactory.getLogger(AuthenticationRequestFilter.class);
 
-    @Autowired
-    private AccessTokenDecoder accessTokenDecoder;
+    private final AccessTokenDecoder accessTokenDecoder;
+
+    public AuthenticationRequestFilter(AccessTokenDecoder accessTokenDecoder) {
+        this.accessTokenDecoder = accessTokenDecoder;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -57,7 +60,7 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
             setupSpringSecurityContext(accessToken);
             chain.doFilter(request, response);
         } catch (Exception e) {
-            logger.error("Error validating access token", e);
+            logger.error("Error validating access token {}", e);
             sendAuthenticationError(response, "Invalid JWT: {}" + e.getMessage());
         }
     }

@@ -24,6 +24,7 @@ public class UserService {
 
     public List<SimpleGrantedAuthority> getAuthoritiesByUsername(String username) {
         UserEntity user = findByUsername(username);
-        return List.of(new SimpleGrantedAuthority(user.getUserRole(user.getId()).name()));
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name());
+        return List.of(authority);
     }
 }

@@ -49,10 +49,10 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             Claims claims = tokenDecoder.decode(authToken);
                             String username = claims.getSubject();
                             Collection<? extends GrantedAuthority> authorities = getAuthorities(claims);
-                            log.info("Decoded username: {}, authorities: {}", username, authorities);
+                            log.info("Stomp endpoint>>>Decoded username: {}, authorities: {}", username, authorities);
                             return new UsernamePasswordAuthenticationToken(username, null, authorities);
                         } catch (Exception e) {
-                            log.error("Error decoding JWT token: {}", e.getMessage(), e);
+                            log.error("Stomp endpoint>>>Error decoding JWT token: {}", e.getMessage(), e);
                             return null;
                         }
                     }
@@ -71,8 +71,6 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .map(param -> param.substring("access_token=".length()))
                 .orElse(null);
     }
-
-
 
     private Collection<? extends GrantedAuthority> getAuthorities(Claims claims) {
         List<String> roles = claims.get("roles", List.class);

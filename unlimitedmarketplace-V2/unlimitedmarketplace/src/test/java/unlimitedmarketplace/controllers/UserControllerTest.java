@@ -49,7 +49,7 @@ import java.util.List;
 
      void getUser_ShouldReturnUser() throws Exception {
         // Arrange
-        GetUserResponse response = new GetUserResponse(1L, "userTest", "user@test.com");
+        GetUserResponse response = new GetUserResponse(1L, "userTest", "user@test.com","USER");
         given(getUserUseCase.getUserById(1L)).willReturn(response);
 
         // Act & Assert

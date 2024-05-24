@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -21,12 +23,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.security.web.SecurityFilterChain;
 
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import unlimitedmarketplace.business.impl.UserDetailsServiceImpl;
 
+import unlimitedmarketplace.domain.UserRoles;
 import unlimitedmarketplace.persistence.UserRepository;
 
 import javax.crypto.SecretKey;
@@ -45,7 +49,6 @@ public class SecurityConfig {
 
     private final UserRepository userRepository;
     private static final String LOGIN = "/login";  // Compliant
-
     public SecurityConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -64,38 +67,24 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-//    public SecurityFilterChain filterChain(HttpSecurity httpSecurity,
-//                                           AuthenticationEntryPoint authenticationEntryPoint,
-//                                           AuthenticationRequestFilter authenticationRequestFilter) throws Exception {
-//        httpSecurity
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .formLogin(AbstractHttpConfigurer::disable)
-//                .sessionManagement(configurer ->
-//                        configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(registry ->
-//                        registry.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()                 // CORS pre-flight requests should be public
-//                                .requestMatchers(HttpMethod.POST, "/students", "/tokens").permitAll() // Creating a student and login are public
-////                                .requestMatchers(SWAGGER_UI_RESOURCES).permitAll()                        // Swagger is also public (In "real life" it would only be public in non-production environments)
-//                                .anyRequest().authenticated()                                             // Everything else --> authentication required, which is Spring security's default behaviour
-//                )
-//                .exceptionHandling(configure -> configure.authenticationEntryPoint(authenticationEntryPoint))
-//                .addFilterBefore(authenticationRequestFilter, UsernamePasswordAuthenticationFilter.class);
-//        return httpSecurity.build();
-//    }
+    
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
+        http.httpBasic(AbstractHttpConfigurer::disable);
         http.cors(withDefaults());
         http.requiresChannel(c -> c.requestMatchers("/actuator/**").requiresInsecure());
+        http.exceptionHandling((exceptions) ->exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+        http.sessionManagement(sessionAuthenticationStrategy ->
+                sessionAuthenticationStrategy.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(request -> {
             request.requestMatchers(
                             "/api/v*/registration/**",
                             "/register*",
                             LOGIN,
                             ("/unlimitedmarketplace/**"),
-                            "/actuator/**").permitAll()
+                            "/actuator/**","unlimitedmarketplace/auth/login").permitAll()
                     .requestMatchers("/unlimitedmarketplace/products/").authenticated()
                     .requestMatchers("/websocket-sockjs-stomp/**").permitAll()  // Allow all WebSocket connection requests
             ;
@@ -103,16 +92,6 @@ public class SecurityConfig {
             request.anyRequest().permitAll();
 
         });
-        http.formLogin(fL -> fL.loginPage(LOGIN)
-                .usernameParameter("email").permitAll()
-                .defaultSuccessUrl("/", true)
-                .failureUrl(LOGIN));
-        http.logout(logOut -> logOut.logoutUrl("/logout")
-                .clearAuthentication(true)
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID", "Idea-2e8e7cee")
-                .logoutSuccessUrl(LOGIN));
-
         return http.build();
 
     }

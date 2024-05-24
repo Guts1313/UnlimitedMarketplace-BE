@@ -22,8 +22,9 @@ public class GetUserUseCaseImpl implements GetUserUseCase {
                         .id(user.getId())
                         .username(user.getUserName())
                         .email(user.getEmail())
+                        .role(user.getUserRole().toString())
                         .build())
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(UserNotFoundException::new);
     }
 
 }

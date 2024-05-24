@@ -58,6 +58,6 @@ public class UserEntity {
         this.email = email;
     }
     public void setUserRole(UserRoles role){this.role = role;}
-    public UserRoles getUserRole(Long id){return role;}
+    public UserRoles getUserRole(){return role;}
 
 }

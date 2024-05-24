@@ -36,25 +36,33 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	compileOnly("org.projectlombok:lombok")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	runtimeOnly("com.mysql:mysql-connector-j")
-	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("com.h2database:h2")
 	implementation("com.auth0:java-jwt:$javaAuthJwt")
 	implementation("io.jsonwebtoken:jjwt-impl:$jsonWebTokenApiJacksonVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("jakarta.xml.bind:jakarta.xml.bind-api:$jakartaXmlJaxbVersion")
+	implementation("org.springframework.security:spring-security-web:$springSecurityWebConfigVersion")
+	implementation("org.springframework.security:spring-security-config:$springSecurityWebConfigVersion")
+	implementation("jakarta.servlet:jakarta.servlet-api:$springSecurityTestJakartaApiVersion")
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+	testImplementation("org.jacoco:org.jacoco.agent:$jacocoAgentVersion")
+	testImplementation("org.springframework.security:spring-security-test:$springSecurityTestJakartaApiVersion")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("com.h2database:h2")
+
+	runtimeOnly("com.mysql:mysql-connector-j")
 	runtimeOnly("org.glassfish.jaxb:jaxb-runtime:$jakartaXmlJaxbVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-api:$jsonWebTokenApiJacksonVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jsonWebTokenApiJacksonVersion")
-	testImplementation("org.jacoco:org.jacoco.agent:$jacocoAgentVersion")
-	implementation("org.springframework.security:spring-security-web:$springSecurityWebConfigVersion")
-	implementation("org.springframework.security:spring-security-config:$springSecurityWebConfigVersion")
-	testImplementation("org.springframework.security:spring-security-test:$springSecurityTestJakartaApiVersion")
-	implementation("jakarta.servlet:jakarta.servlet-api:$springSecurityTestJakartaApiVersion")
-	implementation("org.springframework.boot:spring-boot-starter-websocket")
+
+	compileOnly("org.projectlombok:lombok")
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	annotationProcessor("org.projectlombok:lombok")
+
+
+
+
+
 
 }
 jacoco {

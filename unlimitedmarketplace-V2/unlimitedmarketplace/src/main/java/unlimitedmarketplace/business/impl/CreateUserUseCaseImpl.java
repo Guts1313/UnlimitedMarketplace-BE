@@ -42,7 +42,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
         UserEntity savedUser = userRepository.save(userEntity);
 
         // Return a response object
-        return new CreateUserResponse(savedUser.getId(), savedUser.getUserName(), savedUser.getEmail(),savedUser.getUserRole(savedUser.getId()));
+        return new CreateUserResponse(savedUser.getId(), savedUser.getUserName(), savedUser.getEmail(),savedUser.getUserRole());
     }
 
 }

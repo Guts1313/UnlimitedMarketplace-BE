@@ -6,13 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class GetMyBiddedProductsRequest {
+    private Long userId;
 
-public class GetUserResponse {
-    private Long id;
-    private String username;
-    private String email;
-    private  String role;
 }
