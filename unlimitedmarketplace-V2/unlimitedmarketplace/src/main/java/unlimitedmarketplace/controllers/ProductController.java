@@ -14,6 +14,10 @@ import unlimitedmarketplace.business.CreateProductUseCase;
 import unlimitedmarketplace.business.GetAllProductsUseCase;
 import unlimitedmarketplace.business.GetProductUseCase;
 import unlimitedmarketplace.domain.*;
+import unlimitedmarketplace.persistence.entity.ProductEntity;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/products")
@@ -31,11 +35,11 @@ public class ProductController {
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping
     public ResponseEntity<CreateProductResponse> createProduct(@RequestBody @Valid CreateProductRequest request) {
-        CreateProductResponse response = createProductUseCase.createProduct(request);
         try {
+            CreateProductResponse response = createProductUseCase.createProduct(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -49,7 +53,19 @@ public class ProductController {
         log.info("Authenticated user: {}" , auth.getName() + " with roles: {}" + auth.getAuthorities());
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/mylistings")
+    public ResponseEntity<GetAllProductsResponse> getUserListedProducts(@RequestParam(value = "userId") Long userId) {
+        try {
+            GetAllProductsRequest request = GetAllProductsRequest.builder().id(userId).build();
+            GetAllProductsResponse listedProducts = getAllProducts.getAllListedProductsByUserId(request);
+            return ResponseEntity.ok(listedProducts);
+        } catch (Exception e) {
+            log.error("Failed to fetch listed products: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
     @PreAuthorize("hasRole('ROLE_USER')")
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("{id}")

@@ -5,6 +5,7 @@ import unlimitedmarketplace.persistence.RefreshTokenRepository;
 import unlimitedmarketplace.persistence.entity.RefreshToken;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -37,5 +38,13 @@ public class RefreshTokenServiceImpl {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
     }
 
+    public void invalidateRefreshToken(String refreshToken) {
+        Optional<RefreshToken> token = refreshTokenRepository.findByToken(refreshToken);
+        if (token.isPresent()) {
+            RefreshToken token1 = new RefreshToken();
+            token1.setToken(token.toString());
+            refreshTokenRepository.delete(token1);
+        }
+    }
 
 }

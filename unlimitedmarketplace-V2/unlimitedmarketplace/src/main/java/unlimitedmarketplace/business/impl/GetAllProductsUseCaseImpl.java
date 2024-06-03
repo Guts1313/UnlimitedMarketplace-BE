@@ -10,6 +10,7 @@ import unlimitedmarketplace.persistence.ProductRepository;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GetAllProductsUseCaseImpl implements GetAllProductsUseCase {
@@ -31,6 +32,11 @@ public class GetAllProductsUseCaseImpl implements GetAllProductsUseCase {
         response.setProductEntities(products);
         return response;
     }
-
+    public GetAllProductsResponse getAllListedProductsByUserId(final GetAllProductsRequest request) {
+        List<ProductEntity> products = productRepository.findListedByUserId(request.getId());
+        final GetAllProductsResponse response = new GetAllProductsResponse();
+        response.setProductEntities(products);
+        return response;
+    }
 
 }

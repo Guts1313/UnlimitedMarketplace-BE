@@ -9,17 +9,19 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import unlimitedmarketplace.business.BidService;
+import unlimitedmarketplace.business.GetUserUseCase;
+import unlimitedmarketplace.business.GetUsersUseCase;
 import unlimitedmarketplace.business.SubscriptionService;
-import unlimitedmarketplace.domain.BidRequest;
-import unlimitedmarketplace.domain.BidResponse;
-import unlimitedmarketplace.domain.GetMyBiddedProductsRequest;
-import unlimitedmarketplace.domain.GetMyBiddedProductsResponse;
+import unlimitedmarketplace.domain.*;
+import unlimitedmarketplace.persistence.UserRepository;
 import unlimitedmarketplace.persistence.entity.BidEntity;
+import unlimitedmarketplace.persistence.entity.UserEntity;
 
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -32,10 +34,12 @@ public class BidController {
     private final BidService bidService;
     private static final Logger log = LoggerFactory.getLogger(BidController.class);
     private final SubscriptionService subscriptionService;
-    public BidController(SimpMessagingTemplate messagingTemplate, BidService bidService, SubscriptionService subscriptionService) {
+    private final UserRepository userRepository;
+    public BidController(SimpMessagingTemplate messagingTemplate, BidService bidService, SubscriptionService subscriptionService, UserRepository userRepository) {
         this.messagingTemplate = messagingTemplate;
         this.bidService = bidService;
         this.subscriptionService = subscriptionService;
+        this.userRepository = userRepository;
     }
 
 
@@ -57,28 +61,23 @@ public class BidController {
 
     }
 
-
     @MessageMapping("/placeBid")
     public void handleBid(BidRequest bidRequest, SimpMessageHeaderAccessor headerAccessor) {
         if (bidRequest == null) {
             throw new IllegalArgumentException("Bid request cannot be null.");
         }
-
         if (headerAccessor == null) {
             throw new IllegalArgumentException("Header accessor cannot be null.");
         }
-
         try {
             BidEntity bid = bidService.placeBid(bidRequest);
 
             if (bid == null) {
                 throw new IllegalStateException("Bid creation failed, no bid returned.");
             }
-
             if (bid.getProduct() == null || bid.getProduct().getId() == null) {
                 throw new IllegalStateException("Bid product or product ID is null.");
             }
-
             BigDecimal latestBidAmount = bid.getAmount();
             Long productId = bid.getProduct().getId();
             Long userId = bid.getUser().getId();
@@ -87,11 +86,10 @@ public class BidController {
             if (userId == null) {
                 throw new IllegalStateException("Bid user ID is null.");
             }
-
             BidResponse bidResponse = new BidResponse(productId, userId, latestBidAmount, "success");
             subscriptionService.addUserSubscription(userId, "/topic/product" + productId);
             subscriptionService.addUserSubscription(userId, "/queue/outbid" + productId);
-
+            subscriptionService.addUserSubscription(userId, "/queue/winner" + productId);
             messagingTemplate.convertAndSend("/topic/product" + productId, bidResponse);
 
             // Get the latest bid details
@@ -105,6 +103,7 @@ public class BidController {
                 for (String bidder : uniqueBidders) {
                     if (!bidder.equals(latestBidderUsername)) { // Avoid self-notification
                         messagingTemplate.convertAndSendToUser(bidder, "/queue/outbid" + productId, highestBidAmount.toString());
+                        log.info("Bid sent :{}", highestBidAmount.toString());
                     }
                 }
             }
@@ -115,6 +114,29 @@ public class BidController {
             } else {
                 log.error("Header accessor or user is null: Cannot send error response to user.");
             }
+        }
+    }
+
+    @MessageMapping("/acceptBid")
+    public void acceptBid(AcceptBidRequest acceptBidRequest) {
+        try {
+            Double bidAmount = acceptBidRequest.getBidAmount();
+            Long userId = acceptBidRequest.getUserId();
+            Optional<UserEntity> user = userRepository.findById(userId);
+            if (bidAmount == null){
+                throw new IllegalArgumentException("Bid ID must not be null.");
+            }
+            BidEntity bid = bidService.acceptBid(userId, bidAmount);
+            if (bid != null) {
+                subscriptionService.addUserSubscription(userId, "/queue/winner" + bid.getProduct().getId());
+                messagingTemplate.convertAndSendToUser(bid.getUser().getUserName(), "/queue/winner" + bid.getProduct().getId(), bid.getAmount().toString());
+                log.info("Bid sent to user:{}", bid.getUser().getUserName());
+                log.info("Bid sent for prod id:{}", bid.getProduct().getProductName());
+
+
+            }
+        } catch (Exception e) {
+            log.error("Error accepting bid: {}", e.getMessage(), e);
         }
     }
 
@@ -133,7 +155,6 @@ public class BidController {
         }
 
     }
-
 
 
 }

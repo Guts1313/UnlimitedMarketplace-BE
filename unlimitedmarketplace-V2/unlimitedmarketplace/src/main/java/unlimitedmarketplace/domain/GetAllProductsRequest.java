@@ -12,4 +12,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GetAllProductsRequest {
     private String productsCat;
+    private Long id;
+
+
+    public GetAllProductsRequest(Long userId) {
+        id = userId;
+        this.productsCat = "";
+    }
+
 }

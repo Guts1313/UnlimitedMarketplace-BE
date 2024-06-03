@@ -2,10 +2,19 @@ package unlimitedmarketplace.persistence.entity;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import unlimitedmarketplace.domain.UserRoles;
 
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
 @Table(name = "app_user") // Ensure this matches your actual table name
 public class UserEntity {
 
@@ -13,17 +22,18 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true ,name = "user_name")
+    @Column(unique = true, name = "user_name")
     private String userName;
 
     @Column(name = "password_hash")
     private String passwordHash;
 
-    @Column(unique = true,name = "email")
+    @Column(unique = true, name = "email")
     private String email;
 
-    @Column(unique = false,name = "role")
+    @Column(name = "role")
     private UserRoles role;
+
 
     // Standard getters and setters
     public Long getId() {

@@ -108,5 +108,20 @@ public class UserAuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
+        try {
+
+            String refreshToken = body.get("refreshToken");
+            if (!refreshTokenService.isValid(refreshToken)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            refreshTokenService.invalidateRefreshToken(refreshToken);
+            return ResponseEntity.ok("Logout successful");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Logout failed");
+        }
+    }
+
 
 }

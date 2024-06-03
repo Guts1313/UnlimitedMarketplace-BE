@@ -28,13 +28,16 @@ public class BidEntity {
     @Column(name = "bid_time")
     private LocalDateTime bidTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "bid_status")
+    private String bidStatus;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
     private ProductEntity product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 

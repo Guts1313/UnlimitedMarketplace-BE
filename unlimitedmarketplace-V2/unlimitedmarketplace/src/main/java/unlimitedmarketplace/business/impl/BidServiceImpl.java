@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import unlimitedmarketplace.business.BidService;
 import unlimitedmarketplace.domain.BidRequest;
 import unlimitedmarketplace.domain.GetMyBiddedProductsRequest;
@@ -52,6 +53,18 @@ public class BidServiceImpl implements BidService {
         response.setUserId(id);
         response.setUserBidProducts(userBidProducts);
         return response;
+    }
+
+    @Transactional
+    public BidEntity acceptBid(Long userId, Double bidAmount) {
+        BidEntity bid = bidRepository.findByAmount(BigDecimal.valueOf(bidAmount));
+        if (bid != null) {
+            bid.setBidStatus("ACCEPTED");
+            bidRepository.save(bid);
+        } else {
+            throw new EntityNotFoundException("Bid not found");
+        }
+        return bid;
     }
 
     public BigDecimal findLatestBidAmountByProductId(Long productId) {
