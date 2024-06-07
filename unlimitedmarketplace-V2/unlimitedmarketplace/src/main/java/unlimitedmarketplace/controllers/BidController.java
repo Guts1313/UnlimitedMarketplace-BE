@@ -18,6 +18,7 @@ import unlimitedmarketplace.persistence.entity.BidEntity;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
@@ -120,13 +121,12 @@ public class BidController {
     @MessageMapping("/acceptBid")
     public void acceptBid(AcceptBidRequest acceptBidRequest) {
         try {
-            Double bidAmount = acceptBidRequest.getBidAmount();
+            String bidAmount = acceptBidRequest.getBidAmount();
             Long userId = acceptBidRequest.getUserId();
+            BigDecimal bidAmountBigDecimal = new BigDecimal(bidAmount).setScale(2, RoundingMode.HALF_UP);
+            log.info("Searching for bid with amount: {} and userId: {}", bidAmountBigDecimal, userId);
             Optional<UserEntity> user = userRepository.findById(userId);
-            if (bidAmount == null){
-                throw new IllegalArgumentException("Bid ID must not be null.");
-            }
-            BidEntity bid = bidService.acceptBid(userId, bidAmount);
+            BidEntity bid = bidService.acceptBid(userId, bidAmountBigDecimal);
             if (bid != null) {
                 subscriptionService.addUserSubscription(userId, "/queue/winner" + bid.getProduct().getId());
                 messagingTemplate.convertAndSendToUser(bid.getUser().getUserName(), "/queue/winner" + bid.getProduct().getId(), bid.getAmount().toString());

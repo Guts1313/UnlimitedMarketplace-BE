@@ -22,7 +22,8 @@ public interface BidRepository extends JpaRepository<BidEntity, Long> {
     @Query("SELECT b FROM BidEntity b WHERE b.user.id = :userId ORDER BY b.bidTime DESC")
     List<BidEntity> findBiddedProductsByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT b FROM BidEntity b WHERE b.amount = :amount")
-    BidEntity findByAmount(@Param("amount") BigDecimal amount);
+    @Query(value = "SELECT * FROM bids WHERE amount = :amount AND user_id = :userId ORDER BY bid_time DESC LIMIT 1", nativeQuery = true)
+    BidEntity findFirstByAmountAndUserIdOrderByBidTimeDesc(@Param("amount") BigDecimal amount, @Param("userId") Long userId);
+
 
 }

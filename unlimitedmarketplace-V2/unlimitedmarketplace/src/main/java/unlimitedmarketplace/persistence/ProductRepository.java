@@ -1,6 +1,7 @@
 package unlimitedmarketplace.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import unlimitedmarketplace.domain.ProductStatus;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 
 import java.util.List;
@@ -8,5 +9,5 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<ProductEntity,Long> {
     List<ProductEntity> findProductEntitiesByProductNameLike(String productName);
     List<ProductEntity> findListedByUserId(Long userId);
-
+    List<ProductEntity> findAllByProductStatus(String productStatus);
 }

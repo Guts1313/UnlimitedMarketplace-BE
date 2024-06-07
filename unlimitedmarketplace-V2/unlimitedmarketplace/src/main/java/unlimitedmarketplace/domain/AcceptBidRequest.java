@@ -1,15 +1,15 @@
 package unlimitedmarketplace.domain;
 
 public class AcceptBidRequest {
-    private Double bidAmount;
+    private String bidAmount;
     private Long userId;
 
     // Getters and setters
-    public Double getBidAmount() {
+    public String getBidAmount() {
         return bidAmount;
     }
 
-    public void setBidAmount(Double bidAmount) {
+    public void setBidAmount(String bidAmount) {
         this.bidAmount = bidAmount;
     }
 

@@ -1,6 +1,8 @@
 package unlimitedmarketplace.business.impl;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import unlimitedmarketplace.business.BidService;
 import unlimitedmarketplace.domain.BidRequest;
 import unlimitedmarketplace.domain.GetMyBiddedProductsRequest;
 import unlimitedmarketplace.domain.GetMyBiddedProductsResponse;
+import unlimitedmarketplace.domain.ProductStatus;
 import unlimitedmarketplace.persistence.BidRepository;
 import unlimitedmarketplace.persistence.ProductRepository;
 import unlimitedmarketplace.persistence.UserRepository;
@@ -28,6 +31,7 @@ public class BidServiceImpl implements BidService {
     private final BidRepository bidRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final Logger logs = LoggerFactory.getLogger(BidServiceImpl.class);
 
     public BidServiceImpl(BidRepository bidRepository, ProductRepository productRepository, UserRepository userRepository) {
         this.bidRepository = bidRepository;
@@ -56,12 +60,19 @@ public class BidServiceImpl implements BidService {
     }
 
     @Transactional
-    public BidEntity acceptBid(Long userId, Double bidAmount) {
-        BidEntity bid = bidRepository.findByAmount(BigDecimal.valueOf(bidAmount));
+    public BidEntity acceptBid(Long userId, BigDecimal bidAmount) {
+        logs.info("User id in bidserviceimpl: {}" , userId);
+        logs.info("Bid amount in bidserviceimpl: {}" , bidAmount);
+
+        BidEntity bid = bidRepository.findFirstByAmountAndUserIdOrderByBidTimeDesc(bidAmount,userId);
         if (bid != null) {
             bid.setBidStatus("ACCEPTED");
             bidRepository.save(bid);
+            ProductEntity product = bid.getProduct();
+            product.setProductStatus(String.valueOf(ProductStatus.SOLD));
+            productRepository.saveAndFlush(product);
         } else {
+            logs.error("Bid not found with amount: {} and userId: {}", bidAmount, userId);
             throw new EntityNotFoundException("Bid not found");
         }
         return bid;

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class GetAllProductsRequest {
     private String productsCat;
     private Long id;
-
+    private ProductStatus status;
 
     public GetAllProductsRequest(Long userId) {
         id = userId;

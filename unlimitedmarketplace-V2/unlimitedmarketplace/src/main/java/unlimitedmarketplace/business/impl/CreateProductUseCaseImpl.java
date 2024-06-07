@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import unlimitedmarketplace.business.CreateProductUseCase;
 import unlimitedmarketplace.domain.CreateProductRequest;
 import unlimitedmarketplace.domain.CreateProductResponse;
+import unlimitedmarketplace.domain.ProductStatus;
 import unlimitedmarketplace.domain.UserRoles;
 import unlimitedmarketplace.persistence.ProductRepository;
 import unlimitedmarketplace.persistence.UserRepository;
@@ -31,6 +32,8 @@ public class CreateProductUseCaseImpl implements CreateProductUseCase {
         productEntity.setProductName(request.getProductName());
         productEntity.setProductPrice(request.getProductPrice());
         productEntity.setProductUrl(request.getProductUrl());
+        productEntity.setProductStatus(ProductStatus.ACTIVE.toString());
+
         productEntity.setProductDateAdded(request.getProductDateCreated());
         productEntity.setUser(userEntity);  // Set the user here
 

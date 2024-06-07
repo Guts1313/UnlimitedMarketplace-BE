@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import unlimitedmarketplace.business.GetAllProductsUseCase;
 import unlimitedmarketplace.domain.GetAllProductsRequest;
 import unlimitedmarketplace.domain.GetAllProductsResponse;
+import unlimitedmarketplace.domain.ProductStatus;
 import unlimitedmarketplace.persistence.ProductRepository;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 
@@ -25,7 +26,7 @@ public class GetAllProductsUseCaseImpl implements GetAllProductsUseCase {
         if (StringUtils.hasText(request.getProductsCat())) {
             allProducts = productRepository.findProductEntitiesByProductNameLike(request.getProductsCat());
         } else {
-            allProducts = productRepository.findAll();
+            allProducts = productRepository.findAllByProductStatus(String.valueOf(ProductStatus.valueOf(ProductStatus.ACTIVE.toString())));
         }
         final GetAllProductsResponse response = new GetAllProductsResponse();
         List<ProductEntity> products = allProducts.stream().toList();

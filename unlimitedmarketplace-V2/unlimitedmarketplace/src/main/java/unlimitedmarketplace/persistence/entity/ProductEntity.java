@@ -23,6 +23,8 @@ public class ProductEntity {
 
     @Column(name = "date_added")
     private String productDateAdded;
+    @Column(name = "product_status")
+    private String productStatus;
 
 
     @ManyToOne(fetch = FetchType.EAGER)
