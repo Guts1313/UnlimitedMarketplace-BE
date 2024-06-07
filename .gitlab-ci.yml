@@ -1,4 +1,3 @@
-
 stages:
   - build_and_test
   - docker_build
@@ -34,6 +33,7 @@ docker_build:
     - echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
     - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
     - gcloud config set project $PROJECT_ID
+    - gcloud services enable artifactregistry.googleapis.com
     - gcloud auth configure-docker
     - pwd
     - ls -lah
@@ -56,5 +56,6 @@ deploy:
     url: https://unlimitedmarketplace-backend.$REGION.run.app
   tags:
     - docker
+
 
 
