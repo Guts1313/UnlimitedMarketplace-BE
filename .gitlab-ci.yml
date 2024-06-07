@@ -5,7 +5,7 @@ stages:
 
 variables:
   SONAR_HOST_URL: "http://192.168.0.181:9000"
-  SONAR_LOGIN: "sqp_5b08838331b3c75e02deb42791f8c40d7081f695"
+  SONAR_LOGIN: "sqp_2eb08ef1ab5254501f2fb861a200d019a8dd0c47"
   SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"
   DOCKER_TLS_CERTDIR: ""
   DOCKER_HOST: "tcp://docker:2375"
