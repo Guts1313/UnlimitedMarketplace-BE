@@ -49,13 +49,18 @@ docker_build:
 deploy:
   stage: deploy
   image: google/cloud-sdk:latest
+  before_script:
+    - echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - gcloud config set project $PROJECT_ID
   script:
-    - gcloud run deploy unlimitedmarketplace-backend --image gcr.io/$PROJECT_ID/my-application:latest --region $REGION --platform managed --allow-unauthenticated
+    - gcloud run deploy unlimitedmarketplace-backend --image gcr.io/$PROJECT_ID/my-application:latest --region $REGION --platform managed --allow-unauthenticated --project $PROJECT_ID
   environment:
     name: production
     url: https://unlimitedmarketplace-backend.$REGION.run.app
   tags:
     - docker
+
 
 
 
