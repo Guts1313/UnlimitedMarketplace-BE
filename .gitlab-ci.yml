@@ -53,6 +53,7 @@ deploy:
     - echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
     - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
     - gcloud config set project $PROJECT_ID
+    - gcloud services enable run.googleapis.com
   script:
     - gcloud run deploy unlimitedmarketplace-backend --image gcr.io/$PROJECT_ID/my-application:latest --region $REGION --platform managed --allow-unauthenticated --project $PROJECT_ID
   environment:
@@ -60,6 +61,7 @@ deploy:
     url: https://unlimitedmarketplace-backend.$REGION.run.app
   tags:
     - docker
+
 
 
 
