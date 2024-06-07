@@ -5,7 +5,6 @@ stages:
 
 variables:
   SONAR_HOST_URL: "http://192.168.0.181:9000"
-  SONAR_LOGIN: "sqp_2eb08ef1ab5254501f2fb861a200d019a8dd0c47"
   SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"
   DOCKER_TLS_CERTDIR: ""
   DOCKER_HOST: "tcp://docker:2375"
@@ -18,20 +17,20 @@ services:
 
 build_and_test:
   stage: build_and_test
-  image: gradle:latest  # Use a Docker image that has Gradle and JDK installed
+  image: gradle:latest
   script:
-    - cd unlimitedmarketplace-V2/unlimitedmarketplace  # Change directory to where the settings.gradle file is located
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace
     - gradle clean build
     - gradle test
-    - gradle sonarqube -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
+    - gradle sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
   tags:
-    - docker  # Make sure this tag matches a runner configured to use Docker
+    - docker
 
 docker_build:
   stage: docker_build
   image: docker:19.03.12
   before_script:
-    - echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
+    - echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
     - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
     - gcloud config set project $PROJECT_ID
     - gcloud auth configure-docker
