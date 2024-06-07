@@ -31,8 +31,5 @@ FROM openjdk:17-jdk-slim
 # Make sure the path to the JAR file is correct, and use the actual JAR file name
 COPY --from=builder /app/build/libs/unlimitedmarketplace-0.0.1-SNAPSHOT-plain.jar /app/app.jar
 
-# Expose the application port
-EXPOSE 8080
-
 # Command to run the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
