@@ -1,20 +1,13 @@
 stages:
   - build_and_test
   - docker_build
-  - deploy
 
 variables:
   SONAR_HOST_URL: "http://192.168.0.181:9000"
   SONAR_LOGIN: "sqp_5b08838331b3c75e02deb42791f8c40d7081f695"
-  SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"
+  SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"  # Use your project key
   DOCKER_TLS_CERTDIR: ""
   DOCKER_HOST: "tcp://docker:2375"
-  PROJECT_ID: unlimitedmarketplace
-  REGION: us-central1
-  GCLOUD_SERVICE_KEY: $GCLOUD_SERVICE_KEY
-
-services:
-  - docker:dind
 
 build_and_test:
   stage: build_and_test
@@ -30,30 +23,17 @@ build_and_test:
 docker_build:
   stage: docker_build
   image: docker:19.03.12
+  services:
+    - name: docker:19.03.12-dind
+      alias: docker
+      command: ["--tls=false"]
   before_script:
-    - echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
-    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
-    - gcloud config set project $PROJECT_ID
-    - gcloud auth configure-docker
     - pwd
     - ls -lah
     - cd unlimitedmarketplace-V2/unlimitedmarketplace
     - pwd
     - ls -lah
   script:
-    - docker build -t gcr.io/$PROJECT_ID/my-application:latest -f Dockerfile .
-    - docker push gcr.io/$PROJECT_ID/my-application:latest
+    - docker build -t my-application:latest -f Dockerfile .
   tags:
     - docker
-
-deploy:
-  stage: deploy
-  image: google/cloud-sdk:alpine
-  script:
-    - gcloud run deploy unlimitedmarketplace-backend --image gcr.io/$PROJECT_ID/my-application:latest --region $REGION --platform managed --allow-unauthenticated
-  environment:
-    name: production
-    url: https://unlimitedmarketplace-backend.$REGION.run.app
-  tags:
-    - docker
-
