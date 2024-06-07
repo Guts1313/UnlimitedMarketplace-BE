@@ -1,4 +1,3 @@
-
 plugins {
 	java
 	id("org.springframework.boot") version "3.2.3"
@@ -8,19 +7,18 @@ plugins {
 }
 
 val sonarSecret = System.getenv("SONAR_LOGIN")
-val jacocoAgentVersion = "0.8.9";
-val springSecurityWebConfigVersion="6.2.4"
-val springSecurityTestJakartaApiVersion="6.0.0"
-val jsonWebTokenApiJacksonVersion="0.11.5"
-val jakartaXmlJaxbVersion="3.0.1"
-val javaAuthJwt="4.4.0"
+val jacocoAgentVersion = "0.8.9"
+val springSecurityWebConfigVersion = "6.2.4"
+val springSecurityTestJakartaApiVersion = "6.0.0"
+val jsonWebTokenApiJacksonVersion = "0.11.5"
+val jakartaXmlJaxbVersion = "3.0.1"
+val javaAuthJwt = "4.4.0"
 group = "semester3_angel_unlimitedmarketplace"
 version = "0.0.1-SNAPSHOT"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_17
 }
-
 
 configurations {
 	compileOnly {
@@ -30,6 +28,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	gradlePluginPortal()
 }
 
 dependencies {
@@ -58,23 +57,28 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")
-
-
-
-
-
-
 }
+
+tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+	mainClass.set("unlimitedmarketplace.UnlimitedmarketplaceApplication")
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
+}
+
 jacoco {
 	toolVersion = jacocoAgentVersion  // specify the version you want to use
 }
+
 tasks.jacocoTestReport {
-	dependsOn("test")  // ensures that the test task is run before generating the report
+	dependsOn(tasks.test)  // ensures that the test task is run before generating the report
 	reports {
 		xml.required.set(true)  // required by SonarQube
 		html.required.set(true)  // for human-readable reports
 	}
 }
+
 tasks.test {
 	finalizedBy("jacocoTestReport")  // run jacocoTestReport after tests are complete
 }
@@ -87,10 +91,6 @@ sonarqube {
 		property("sonar.login", sonarSecret)
 		property("sonar.jacoco.reportPaths", buildDir.resolve("reports/jacoco/test/jacocoTestReport.xml").absolutePath)
 		property("sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml")
-
 	}
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
-}

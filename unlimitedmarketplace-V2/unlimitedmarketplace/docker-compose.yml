@@ -3,17 +3,26 @@ services:
   app:
     build: .
     ports:
-      - "8090:8080"
+      - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/unlimitedmarketplace?useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: A1312
     depends_on:
       - db
+    networks:
+      - app-network
+
   db:
     image: mysql:8.3.0
     environment:
       MYSQL_DATABASE: unlimitedmarketplace
       MYSQL_ROOT_PASSWORD: A1312
     ports:
-      - "3390:3306"
+      - "3390:3306"  # Change the host port to 3390 to avoid conflicts
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
