@@ -12,6 +12,7 @@ RUN apt-get update && \
 ENV GRADLE_HOME=/opt/gradle/gradle-7.5
 ENV PATH=${GRADLE_HOME}/bin:${PATH}
 ENV JAVA_HOME=/usr/local/openjdk-17
+ENV HOST 0.0.0.0
 
 # Set the working directory inside the Docker image
 WORKDIR /app
@@ -30,6 +31,9 @@ FROM openjdk:17-jdk-slim
 # Copy the built application jar from the build stage to the current stage
 # Make sure the path to the JAR file is correct, and use the actual JAR file name
 COPY --from=builder /app/build/libs/unlimitedmarketplace-0.0.1-SNAPSHOT-plain.jar /app/app.jar
+
+# Expose the application port
+EXPOSE 8080
 
 # Command to run the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
