@@ -35,6 +35,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+
 	implementation("com.auth0:java-jwt:$javaAuthJwt")
 	implementation("io.jsonwebtoken:jjwt-impl:$jsonWebTokenApiJacksonVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security")

@@ -5,9 +5,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/unlimitedmarketplace?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://unlimitedmarketplacedb.cvkauiwso2wc.eu-north-1.rds.amazonaws.com/unlimitedmarketplace?useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: A1312
+      SPRING_DATASOURCE_PASSWORD: Dante1312
     depends_on:
       - db
     networks:
@@ -17,7 +17,7 @@ services:
     image: mysql:8.3.0
     environment:
       MYSQL_DATABASE: unlimitedmarketplace
-      MYSQL_ROOT_PASSWORD: A1312
+      MYSQL_ROOT_PASSWORD: Dante1312
     ports:
       - "3390:3306"  # Change the host port to 3390 to avoid conflicts
     networks:
