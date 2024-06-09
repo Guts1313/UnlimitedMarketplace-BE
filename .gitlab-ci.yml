@@ -51,10 +51,10 @@ deploy:
     - gcloud config set project $PROJECT_ID
     - gcloud services enable run.googleapis.com
   script:
-    - >
+    - |
       BACKEND_URL=$(gcloud run deploy unlimitedmarketplace-backend --image gcr.io/$PROJECT_ID/unlimitedmarketplace:latest --region $REGION --platform managed --allow-unauthenticated --format="value(status.url)" --update-env-vars "SPRING_DATASOURCE_URL=jdbc:mysql://unlimitedmarketplacedb.cvkauiwso2wc.eu-north-1.rds.amazonaws.com:3306/unlimitedmarketplace?useSSL=false&allowPublicKeyRetrieval=true,SPRING_DATASOURCE_USERNAME=root,SPRING_DATASOURCE_PASSWORD=Dante1312,SPRING_JPA_HIBERNATE_DDL_AUTO=update,SPRING_JPA_SHOW_SQL=true,SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQLDialect,SPRING_SECURITY_USER_NAME=user,SPRING_SECURITY_USER_PASSWORD=\$2a\$12\$m3c2pg8r9HxOnWvTv/mzZOlB197OrG0cdk6qoYO48PrseY1kCBB7C,JWT_SECRET=VGhpcyBpcyBhbiBleGFtcGxlIGJhc2U2NC1lbmNvZGVkIHNlY3JldCBrZXku,JWT_EXPIRATION=60")
-    - echo "Backend URL: $BACKEND_URL"
-    - echo "REACT_APP_BACKEND_URL=$BACKEND_URL" > backend_url.env
+      echo "Backend URL: $BACKEND_URL"
+      echo "REACT_APP_BACKEND_URL=$BACKEND_URL" > backend_url.env
   artifacts:
     paths:
       - backend_url.env
