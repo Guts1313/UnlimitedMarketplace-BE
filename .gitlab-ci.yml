@@ -51,7 +51,7 @@ deploy:
     - gcloud config set project $PROJECT_ID
     - gcloud services enable run.googleapis.com
   script:
-    - |
+    - >
       BACKEND_URL=$(gcloud run deploy unlimitedmarketplace-backend \
       --image gcr.io/$PROJECT_ID/unlimitedmarketplace:latest \
       --region $REGION \
