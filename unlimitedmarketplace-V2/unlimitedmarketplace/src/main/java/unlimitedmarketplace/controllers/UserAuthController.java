@@ -24,7 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
 public class UserAuthController {
 
     private final AuthenticationManager authenticationManager;

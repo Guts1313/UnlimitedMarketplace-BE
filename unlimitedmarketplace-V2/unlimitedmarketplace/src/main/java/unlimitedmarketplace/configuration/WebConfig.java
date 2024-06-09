@@ -14,5 +14,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("Authorization", "Content-Type")
                 .allowCredentials(true);
+        registry.addMapping("/**")
+                .allowedOrigins("https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+
     }
 }

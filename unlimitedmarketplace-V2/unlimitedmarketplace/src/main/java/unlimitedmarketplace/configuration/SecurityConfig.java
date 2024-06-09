@@ -56,7 +56,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000")); // Use patterns for flexibility
+        configuration.setAllowedOriginPatterns(List.of("https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")); // Use patterns for flexibility
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         // If you are using credentials (cookies, authentication), you must specify origins, not use '*'
