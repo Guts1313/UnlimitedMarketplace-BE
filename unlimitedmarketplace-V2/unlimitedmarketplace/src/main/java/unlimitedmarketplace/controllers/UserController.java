@@ -30,14 +30,14 @@ public class UserController {
 
     @PreAuthorize("hasRole('USER')")
 
-    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUser(@PathVariable(value = "id") final Long id){
         final GetUserResponse responseOptional = getUserUseCase.getUserById(id);
         return ResponseEntity.ok().body(responseOptional);
     }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping
     public ResponseEntity<GetAllUsersResponse> getUsers(@RequestParam(value = "userName", required = false) String userName) {
         GetAllUsersRequest request = GetAllUsersRequest.builder().userName(userName).build();
@@ -48,7 +48,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 //    @PreAuthorize("hasRole('USER')")
-    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @PostMapping
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
         try {
@@ -62,7 +62,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @PutMapping("{id}")
     public ResponseEntity<Void> updateUser(@PathVariable(value = "id") long id,
                                            @RequestBody @Valid UpdateUserPasswordRequest request){
@@ -71,7 +71,7 @@ public class UserController {
         updateUserPasswordUseCase.updatePassword(request);
         return ResponseEntity.noContent().build();
     }
-    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @DeleteMapping("{id}")
     @Transactional
     @PreAuthorize("hasRole('USER')")
