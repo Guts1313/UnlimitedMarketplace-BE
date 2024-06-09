@@ -19,6 +19,7 @@ import unlimitedmarketplace.domain.*;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace")
+@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
 @AllArgsConstructor
 public class UserController {
     private final GetUserUseCase getUserUseCase;
@@ -29,13 +30,13 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @PreAuthorize("hasRole('USER')")
-
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("{id}")
-    public ResponseEntity<GetUserResponse> getUser(@PathVariable(value = "id") final Long id){
+    public ResponseEntity<GetUserResponse> getUser(@PathVariable(value = "id") final Long id) {
         final GetUserResponse responseOptional = getUserUseCase.getUserById(id);
         return ResponseEntity.ok().body(responseOptional);
     }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping
@@ -44,11 +45,12 @@ public class UserController {
         GetAllUsersResponse response = getUsersUseCase.getAllUsers(request);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Authenticated user: {}" , auth.getName() + " with roles: " + auth.getAuthorities());
+        log.info("Authenticated user: {}", auth.getName() + " with roles: " + auth.getAuthorities());
         return ResponseEntity.ok(response);
     }
-//    @PreAuthorize("hasRole('USER')")
-@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
+
+    //    @PreAuthorize("hasRole('USER')")
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @PostMapping
     public ResponseEntity<CreateUserResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
         try {
@@ -65,19 +67,20 @@ public class UserController {
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @PutMapping("{id}")
     public ResponseEntity<Void> updateUser(@PathVariable(value = "id") long id,
-                                           @RequestBody @Valid UpdateUserPasswordRequest request){
+                                           @RequestBody @Valid UpdateUserPasswordRequest request) {
 
         request.setId(id);
         updateUserPasswordUseCase.updatePassword(request);
         return ResponseEntity.noContent().build();
     }
+
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @DeleteMapping("{id}")
     @Transactional
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") final long id){
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") final long id) {
         deleteUserUseCase.deleteUser(id);
-       return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

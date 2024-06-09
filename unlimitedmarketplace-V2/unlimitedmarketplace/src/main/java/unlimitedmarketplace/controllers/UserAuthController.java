@@ -82,6 +82,7 @@ public class UserAuthController {
         }
     }
     @PostMapping("/refresh-token")
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody Map<String, String> body) {
         String refreshToken = body.get("refreshToken");
         if (!refreshTokenService.isValid(refreshToken)) {
@@ -109,6 +110,7 @@ public class UserAuthController {
         }
     }
     @PostMapping("/logout")
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
         try {
 

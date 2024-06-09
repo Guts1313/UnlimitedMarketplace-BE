@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/subscriptions")
-@CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
 public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
@@ -21,7 +21,7 @@ public class SubscriptionController {
         this.subscriptionService = subscriptionService;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<String>> getUserSubscriptions(@PathVariable Long userId) {
         List<String> subscriptions = subscriptionService.getUserSubscriptions(userId);

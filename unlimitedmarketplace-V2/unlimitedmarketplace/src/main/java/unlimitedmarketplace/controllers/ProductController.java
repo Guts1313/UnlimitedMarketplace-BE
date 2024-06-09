@@ -21,8 +21,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/products")
-
 @AllArgsConstructor
+@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
 
 public class ProductController {
 
@@ -32,7 +32,7 @@ public class ProductController {
     private static final Logger log = LoggerFactory.getLogger(ProductController.class);
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @PostMapping
     public ResponseEntity<CreateProductResponse> createProduct(@RequestBody @Valid CreateProductRequest request) {
         try {
@@ -44,7 +44,7 @@ public class ProductController {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping
     public ResponseEntity<GetAllProductsResponse> getAllProducts(@RequestParam(value = "productCat", required = false) String productCat) {
         GetAllProductsRequest request = GetAllProductsRequest.builder().productsCat(productCat).build();
@@ -54,7 +54,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     @PreAuthorize("hasRole('ROLE_USER')")
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("/mylistings")
     public ResponseEntity<GetAllProductsResponse> getUserListedProducts(@RequestParam(value = "userId") Long userId) {
         try {
@@ -67,7 +67,7 @@ public class ProductController {
         }
     }
     @PreAuthorize("hasRole('ROLE_USER')")
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("{id}")
     public ResponseEntity<GetProductResponse> getProduct(@PathVariable(value = "id") final Long id) {
         GetProductResponse response;

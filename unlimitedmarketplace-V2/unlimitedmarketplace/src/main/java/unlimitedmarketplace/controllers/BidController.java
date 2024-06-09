@@ -27,7 +27,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/bids")
-@CrossOrigin(origins = "http://localhost:3000") // Allow cross-origin requests from the frontend
+@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
 
 public class BidController {
 

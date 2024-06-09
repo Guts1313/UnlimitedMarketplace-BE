@@ -59,7 +59,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 
                 })
-                .setAllowedOrigins("http://localhost:3000")
+                .setAllowedOrigins("https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
                 .withSockJS();
     }
 
