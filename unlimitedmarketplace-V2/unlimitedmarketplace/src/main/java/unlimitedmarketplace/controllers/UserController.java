@@ -29,7 +29,7 @@ public class UserController {
     private final DeleteUserUseCase deleteUserUseCase;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @PreAuthorize("hasRole('ROLE_USER') and #id==authentication.principal.id")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUser(@PathVariable(value = "id") final Long id) {

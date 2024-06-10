@@ -44,7 +44,7 @@ import java.util.List;
     @MockBean
     private DeleteUserUseCase deleteUserUseCase;
 
-   
+
     @Test
     @WithMockUser(username="admin", roles={"ADMIN"})
      void getUsers_ShouldReturnAllUsers() throws Exception {
