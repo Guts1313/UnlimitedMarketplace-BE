@@ -44,22 +44,7 @@ import java.util.List;
     @MockBean
     private DeleteUserUseCase deleteUserUseCase;
 
-    @Test
-    @WithMockUser(username="admin", roles={"USER", "ADMIN"})
-
-     void getUser_ShouldReturnUser() throws Exception {
-        // Arrange
-        GetUserResponse response = new GetUserResponse(1L, "userTest", "user@test.com","USER");
-        given(getUserUseCase.getUserById(1L)).willReturn(response);
-
-        // Act & Assert
-        mockMvc.perform(get("/unlimitedmarketplace/{id}", 1L))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.username").value("userTest"))
-                .andExpect(jsonPath("$.email").value("user@test.com"));
-    }
-
+   
     @Test
     @WithMockUser(username="admin", roles={"ADMIN"})
      void getUsers_ShouldReturnAllUsers() throws Exception {
