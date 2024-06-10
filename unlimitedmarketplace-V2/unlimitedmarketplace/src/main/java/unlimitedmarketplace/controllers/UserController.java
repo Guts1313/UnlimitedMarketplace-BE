@@ -29,7 +29,6 @@ public class UserController {
     private final DeleteUserUseCase deleteUserUseCase;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @PreAuthorize("hasRole('USER')")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUser(@PathVariable(value = "id") final Long id) {
@@ -63,7 +62,6 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('USER')")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @PutMapping("{id}")
     public ResponseEntity<Void> updateUser(@PathVariable(value = "id") long id,
@@ -77,7 +75,6 @@ public class UserController {
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @DeleteMapping("{id}")
     @Transactional
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") final long id) {
         deleteUserUseCase.deleteUser(id);
         return ResponseEntity.noContent().build();

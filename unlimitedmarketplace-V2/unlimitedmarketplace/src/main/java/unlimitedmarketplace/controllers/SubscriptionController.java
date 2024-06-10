@@ -20,7 +20,6 @@ public class SubscriptionController {
     public SubscriptionController(SubscriptionService subscriptionService) {
         this.subscriptionService = subscriptionService;
     }
-    @PreAuthorize("hasRole('ROLE_USER') and #userId == authentication.principal.id")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<String>> getUserSubscriptions(@PathVariable Long userId) {
