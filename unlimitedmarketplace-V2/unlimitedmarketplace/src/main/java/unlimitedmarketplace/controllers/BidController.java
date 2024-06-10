@@ -9,20 +9,16 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import unlimitedmarketplace.business.BidService;
-import unlimitedmarketplace.business.GetUserUseCase;
-import unlimitedmarketplace.business.GetUsersUseCase;
 import unlimitedmarketplace.business.SubscriptionService;
 import unlimitedmarketplace.domain.*;
 import unlimitedmarketplace.persistence.UserRepository;
 import unlimitedmarketplace.persistence.entity.BidEntity;
-import unlimitedmarketplace.persistence.entity.UserEntity;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -35,12 +31,12 @@ public class BidController {
     private final BidService bidService;
     private static final Logger log = LoggerFactory.getLogger(BidController.class);
     private final SubscriptionService subscriptionService;
-    private final UserRepository userRepository;
+    private static final String QUEUE_WINNER = "/queue/winner";  // Compliant
+
     public BidController(SimpMessagingTemplate messagingTemplate, BidService bidService, SubscriptionService subscriptionService, UserRepository userRepository) {
         this.messagingTemplate = messagingTemplate;
         this.bidService = bidService;
         this.subscriptionService = subscriptionService;
-        this.userRepository = userRepository;
     }
 
 
@@ -57,8 +53,6 @@ public class BidController {
 
     @MessageMapping("/notification")
     public void subscribeToNotifications(String message) {
-        // This method is a placeholder to ensure subscription can be established.
-        // Actual notifications will be sent from elsewhere in the application logic
 
     }
 
@@ -90,7 +84,7 @@ public class BidController {
             BidResponse bidResponse = new BidResponse(productId, userId, latestBidAmount, "success");
             subscriptionService.addUserSubscription(userId, "/topic/product" + productId);
             subscriptionService.addUserSubscription(userId, "/queue/outbid" + productId);
-            subscriptionService.addUserSubscription(userId, "/queue/winner" + productId);
+            subscriptionService.addUserSubscription(userId, QUEUE_WINNER + productId);
             messagingTemplate.convertAndSend("/topic/product" + productId, bidResponse);
 
             // Get the latest bid details
@@ -125,11 +119,10 @@ public class BidController {
             Long userId = acceptBidRequest.getUserId();
             BigDecimal bidAmountBigDecimal = new BigDecimal(bidAmount).setScale(2, RoundingMode.HALF_UP);
             log.info("Searching for bid with amount: {} and userId: {}", bidAmountBigDecimal, userId);
-            Optional<UserEntity> user = userRepository.findById(userId);
             BidEntity bid = bidService.acceptBid(userId, bidAmountBigDecimal);
             if (bid != null) {
-                subscriptionService.addUserSubscription(userId, "/queue/winner" + bid.getProduct().getId());
-                messagingTemplate.convertAndSendToUser(bid.getUser().getUserName(), "/queue/winner" + bid.getProduct().getId(), bid.getAmount().toString());
+                subscriptionService.addUserSubscription(userId, QUEUE_WINNER + bid.getProduct().getId());
+                messagingTemplate.convertAndSendToUser(bid.getUser().getUserName(), QUEUE_WINNER + bid.getProduct().getId(), bid.getAmount().toString());
                 log.info("Bid sent to user:{}", bid.getUser().getUserName());
                 log.info("Bid sent for prod id:{}", bid.getProduct().getProductName());
 
@@ -155,7 +148,6 @@ public class BidController {
         }
 
     }
-
 
 }
 

@@ -1,7 +1,6 @@
 package unlimitedmarketplace.persistence;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import unlimitedmarketplace.domain.ProductStatus;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 
 import java.util.List;

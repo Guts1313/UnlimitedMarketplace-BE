@@ -14,10 +14,6 @@ import unlimitedmarketplace.business.CreateProductUseCase;
 import unlimitedmarketplace.business.GetAllProductsUseCase;
 import unlimitedmarketplace.business.GetProductUseCase;
 import unlimitedmarketplace.domain.*;
-import unlimitedmarketplace.persistence.entity.ProductEntity;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/unlimitedmarketplace/products")

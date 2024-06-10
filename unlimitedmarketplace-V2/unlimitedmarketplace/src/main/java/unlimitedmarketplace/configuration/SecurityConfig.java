@@ -30,7 +30,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import unlimitedmarketplace.business.impl.UserDetailsServiceImpl;
 
-import unlimitedmarketplace.domain.UserRoles;
 import unlimitedmarketplace.persistence.UserRepository;
 
 import javax.crypto.SecretKey;
@@ -75,7 +74,7 @@ public class SecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.cors(withDefaults());
         http.requiresChannel(c -> c.requestMatchers("/actuator/**").requiresInsecure());
-        http.exceptionHandling((exceptions) ->exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+        http.exceptionHandling(exceptions ->exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
         http.sessionManagement(sessionAuthenticationStrategy ->
                 sessionAuthenticationStrategy.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(request -> {

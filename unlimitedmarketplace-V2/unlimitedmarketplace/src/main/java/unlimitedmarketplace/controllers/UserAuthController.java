@@ -3,7 +3,6 @@ package unlimitedmarketplace.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +29,7 @@ public class UserAuthController {
     private final AuthenticationManager authenticationManager;
     private final AccessTokenEncoderDecoderImpl tokenService;
     private final RefreshTokenServiceImpl refreshTokenService;
-    private final UserService userService; // Added UserService
+    private final UserService userService;
     private static final Logger logs = LoggerFactory.getLogger(UserAuthController.class);
 
     public UserAuthController(AuthenticationManager authenticationManager, AccessTokenEncoderDecoderImpl tokenService,

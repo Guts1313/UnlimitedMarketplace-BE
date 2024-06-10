@@ -20,7 +20,7 @@ private final UserRepository userRepository;
     public GetUsersUseCaseImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-    private Logger logger = LoggerFactory.getLogger(GetUserUseCaseImpl.class);
+    private Logger logger = LoggerFactory.getLogger(GetUsersUseCaseImpl.class);
     @Override
     public GetAllUsersResponse getAllUsers(final GetAllUsersRequest request) {
         List<UserEntity> allUsers;

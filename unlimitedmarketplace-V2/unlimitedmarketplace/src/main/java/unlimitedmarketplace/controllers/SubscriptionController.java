@@ -2,8 +2,8 @@ package unlimitedmarketplace.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import unlimitedmarketplace.business.SubscriptionService;
 
@@ -20,7 +20,7 @@ public class SubscriptionController {
     public SubscriptionController(SubscriptionService subscriptionService) {
         this.subscriptionService = subscriptionService;
     }
-
+    @PreAuthorize("hasRole('ROLE_USER') and #userId == authentication.principal.id")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<String>> getUserSubscriptions(@PathVariable Long userId) {

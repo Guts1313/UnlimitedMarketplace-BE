@@ -1,20 +1,12 @@
 package unlimitedmarketplace.controllers;
 
-import org.springframework.context.annotation.Role;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import unlimitedmarketplace.business.DeleteUserUseCase;
 import unlimitedmarketplace.business.GetUsersUseCase;
 import unlimitedmarketplace.domain.GetAllUsersRequest;
 import unlimitedmarketplace.domain.GetAllUsersResponse;
-import unlimitedmarketplace.domain.UserRoles;
-import unlimitedmarketplace.domain.UserService;
-import unlimitedmarketplace.persistence.UserRepository;
-import unlimitedmarketplace.persistence.entity.UserEntity;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/adminpanel")

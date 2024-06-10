@@ -11,7 +11,6 @@ import unlimitedmarketplace.persistence.ProductRepository;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GetAllProductsUseCaseImpl implements GetAllProductsUseCase {

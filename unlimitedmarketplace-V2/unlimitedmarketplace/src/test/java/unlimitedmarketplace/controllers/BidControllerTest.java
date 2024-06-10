@@ -11,16 +11,15 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import unlimitedmarketplace.business.BidService;
 import unlimitedmarketplace.business.SubscriptionService;
-import unlimitedmarketplace.domain.BidRequest;
-import unlimitedmarketplace.domain.BidResponse;
+import unlimitedmarketplace.domain.*;
 
 import unlimitedmarketplace.persistence.entity.BidEntity;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.Principal;
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,11 +30,16 @@ import static org.mockito.Mockito.*;
 
     @Mock
     private SimpMessagingTemplate messagingTemplate;
+
+    @Mock
     private SimpMessageHeaderAccessor headerAccessor;
+
     @Mock
     private BidService bidService;
+
     @Mock
-    SubscriptionService subscriptionService;
+    private SubscriptionService subscriptionService;
+
     @InjectMocks
     private BidController bidController;
 
@@ -149,5 +153,60 @@ import static org.mockito.Mockito.*;
         // Verify that messagingTemplate.convertAndSend is never called
         verify(messagingTemplate, never()).convertAndSend(anyString(), any(BidResponse.class));
     }
+    @Test
+    void testAcceptBidSuccess() {
+        AcceptBidRequest acceptBidRequest = new AcceptBidRequest("200.00", 2L);
+
+        ProductEntity product = new ProductEntity();
+        product.setId(1L);
+        BidEntity bidEntity = new BidEntity();
+        bidEntity.setAmount(new BigDecimal("200.00"));
+        bidEntity.setProduct(product);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(2L);
+        userEntity.setUserName("user1");
+        bidEntity.setUser(userEntity);
+
+        when(bidService.acceptBid(acceptBidRequest.getUserId(), new BigDecimal(acceptBidRequest.getBidAmount()).setScale(2, RoundingMode.HALF_UP))).thenReturn(bidEntity);
+
+        bidController.acceptBid(acceptBidRequest);
+
+        verify(messagingTemplate, times(1)).convertAndSendToUser(eq("user1"), eq("/queue/winner1"), anyString());
+    }
+
+    @Test
+    void testAcceptBidFailure() {
+        AcceptBidRequest acceptBidRequest = new AcceptBidRequest("200.00", 2L);
+
+        when(bidService.acceptBid(anyLong(), any(BigDecimal.class))).thenThrow(new RuntimeException("Database error"));
+
+        bidController.acceptBid(acceptBidRequest);
+
+        verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void testGetUserBidsSuccess() {
+        Long userId = 1L;
+        GetMyBiddedProductsResponse response = new GetMyBiddedProductsResponse();
+        when(bidService.findBiddedProductsById(any(GetMyBiddedProductsRequest.class))).thenReturn(response);
+
+        ResponseEntity<GetMyBiddedProductsResponse> result = bidController.getUserBids(userId);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(response, result.getBody());
+    }
+
+    @Test
+    void testGetUserBidsFailure() {
+        Long userId = 1L;
+        when(bidService.findBiddedProductsById(any(GetMyBiddedProductsRequest.class))).thenThrow(new RuntimeException("Database error"));
+
+        ResponseEntity<GetMyBiddedProductsResponse> result = bidController.getUserBids(userId);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+        assertNull(result.getBody());
+    }
+
 
 }

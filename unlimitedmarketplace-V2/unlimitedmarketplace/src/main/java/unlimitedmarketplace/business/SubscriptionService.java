@@ -1,6 +1,5 @@
 package unlimitedmarketplace.business;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import unlimitedmarketplace.persistence.SubscriptionRepository;
 import unlimitedmarketplace.persistence.entity.SubscriptionEntity;

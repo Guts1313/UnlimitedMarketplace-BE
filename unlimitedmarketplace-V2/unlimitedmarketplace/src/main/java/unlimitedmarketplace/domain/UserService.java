@@ -21,7 +21,9 @@ public class UserService {
         return userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
-
+    public List<UserEntity> findAllUsers() {
+        return userRepository.findAll();
+    }
     public List<SimpleGrantedAuthority> getAuthoritiesByUsername(String username) {
         UserEntity user = findByUsername(username);
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name());

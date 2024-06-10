@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Entity
 @Data
+
 @Table(name="app_products")
 public class ProductEntity {
     @Id

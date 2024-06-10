@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import unlimitedmarketplace.persistence.entity.BidEntity;
-import unlimitedmarketplace.persistence.entity.ProductEntity;
-
 import java.util.List;
 
 @Data

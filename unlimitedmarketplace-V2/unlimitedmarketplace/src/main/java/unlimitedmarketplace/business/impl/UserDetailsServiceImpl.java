@@ -34,7 +34,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .authorities(Collections.singletonList(authority))
                 .build();
     }
-
-
-
 }

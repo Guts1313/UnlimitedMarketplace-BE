@@ -6,7 +6,6 @@ import unlimitedmarketplace.business.CreateProductUseCase;
 import unlimitedmarketplace.domain.CreateProductRequest;
 import unlimitedmarketplace.domain.CreateProductResponse;
 import unlimitedmarketplace.domain.ProductStatus;
-import unlimitedmarketplace.domain.UserRoles;
 import unlimitedmarketplace.persistence.ProductRepository;
 import unlimitedmarketplace.persistence.UserRepository;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
