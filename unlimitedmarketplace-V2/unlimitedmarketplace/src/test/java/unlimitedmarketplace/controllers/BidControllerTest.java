@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import unlimitedmarketplace.business.BidService;
-import unlimitedmarketplace.business.SubscriptionService;
+import unlimitedmarketplace.business.interfaces.BidService;
+import unlimitedmarketplace.business.impl.SubscriptionService;
 import unlimitedmarketplace.domain.*;
 
 import unlimitedmarketplace.persistence.entity.BidEntity;
@@ -42,15 +42,6 @@ import static org.mockito.Mockito.*;
 
     @InjectMocks
     private BidController bidController;
-
-//    @BeforeEach
-//    void setUp() {
-//        Principal principal = mock(Principal.class);
-//        when(principal.getName()).thenReturn("user1");
-//
-//        headerAccessor = mock(SimpMessageHeaderAccessor.class);
-//        when(headerAccessor.getUser()).thenReturn(principal);
-//    }
 
 
     @Test
@@ -98,20 +89,15 @@ import static org.mockito.Mockito.*;
 
     @Test
     void testHandleBidWithUnauthenticatedUser() {
-        // Create the BidRequest
         BidRequest bidRequest = new BidRequest(1L, 2L, new BigDecimal("200.00"));
 
-        // Mock SimpMessageHeaderAccessor to return null for getUser
         SimpMessageHeaderAccessor headerAccessor = mock(SimpMessageHeaderAccessor.class);
         when(headerAccessor.getUser()).thenReturn(null);
 
-        // Ensure a valid bid is returned from the bidService
         when(bidService.placeBid(bidRequest)).thenReturn(new BidEntity());
 
-        // Call the handleBid method
         bidController.handleBid(bidRequest, headerAccessor);
 
-        // Verify that messagingTemplate.convertAndSendToUser is never called
         verify(messagingTemplate, never()).convertAndSendToUser(anyString(), anyString(), any());
     }
 
@@ -140,17 +126,14 @@ import static org.mockito.Mockito.*;
 
     @Test
     void testHandleBidFailureDueToNullBid() {
-        // Mock SimpMessageHeaderAccessor
         SimpMessageHeaderAccessor headerAccessor = mock(SimpMessageHeaderAccessor.class);
 
-        // Verify that the exception was thrown
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             bidController.handleBid(null, headerAccessor);
         });
 
         assertEquals("Bid request cannot be null.", exception.getMessage());
 
-        // Verify that messagingTemplate.convertAndSend is never called
         verify(messagingTemplate, never()).convertAndSend(anyString(), any(BidResponse.class));
     }
     @Test

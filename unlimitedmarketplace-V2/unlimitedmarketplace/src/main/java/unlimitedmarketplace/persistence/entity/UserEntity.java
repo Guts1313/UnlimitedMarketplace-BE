@@ -15,7 +15,7 @@ import unlimitedmarketplace.domain.UserRoles;
 @AllArgsConstructor
 @Builder
 
-@Table(name = "app_user") // Ensure this matches your actual table name
+@Table(name = "app_user")
 public class UserEntity {
 
     @Id

@@ -8,21 +8,22 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Random;
+
 @Configuration
 @EnableWebSecurity
-@Profile("test") // Ensures this configuration is only active when the "test" profile is used
- class TestsSecurityConfig {
+@Profile("test")
+ public class TestsSecurityConfig {
 
     @Bean
     public SecurityFilterChain disableSecurity(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disabling CSRF as per your setup
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v*/registration/**", "/register*", "/login", "/actuator/**").permitAll()  // Allowing unauthenticated access to these endpoints
-                        .requestMatchers("/unlimitedmarketplace/**").hasRole("ADMIN")  // Restricting this endpoint to ADMIN only
-                        .anyRequest().authenticated()  // All other requests require authentication
+                        .requestMatchers("/api/v*/registration/**", "/register*", "/login", "/actuator/**").permitAll()
+                        .requestMatchers("/unlimitedmarketplace/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 );
-
         return http.build();
     }
 }

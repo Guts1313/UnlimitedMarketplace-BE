@@ -2,10 +2,10 @@ package unlimitedmarketplace.business.impl;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.business.UpdateUserPasswordUseCase;
+import unlimitedmarketplace.business.interfaces.UpdateUserPasswordUseCase;
 import unlimitedmarketplace.business.exceptions.InvalidUserException;
 import unlimitedmarketplace.domain.UpdateUserPasswordRequest;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 
 import java.util.Optional;

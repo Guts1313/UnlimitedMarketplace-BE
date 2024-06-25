@@ -10,9 +10,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import unlimitedmarketplace.business.CreateProductUseCase;
-import unlimitedmarketplace.business.GetAllProductsUseCase;
-import unlimitedmarketplace.business.GetProductUseCase;
+import unlimitedmarketplace.business.interfaces.CreateProductUseCase;
+import unlimitedmarketplace.business.interfaces.GetAllProductsUseCase;
+import unlimitedmarketplace.business.interfaces.GetProductUseCase;
 import unlimitedmarketplace.domain.*;
 
 @RestController

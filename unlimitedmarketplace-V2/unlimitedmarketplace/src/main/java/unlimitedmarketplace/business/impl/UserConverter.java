@@ -3,7 +3,7 @@ package unlimitedmarketplace.business.impl;
 import unlimitedmarketplace.domain.User;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 
-final class UserConverter {
+public final class UserConverter {
     private UserConverter() {
 
     }

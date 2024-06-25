@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class LoginResponse {
     private String accessToken;
     private String refreshToken;
-    private String type = "Bearer";  // If you are using Bearer tokens, otherwise adjust as necessary
+    private String type = "Bearer";
     private Long userId;
 
     public LoginResponse(String token, String refreshToken, Long userId) {

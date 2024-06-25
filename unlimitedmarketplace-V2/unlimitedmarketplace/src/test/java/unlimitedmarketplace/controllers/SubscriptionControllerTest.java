@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import unlimitedmarketplace.business.SubscriptionService;
+import unlimitedmarketplace.business.impl.SubscriptionService;
 
 import java.util.Arrays;
 import java.util.Collections;

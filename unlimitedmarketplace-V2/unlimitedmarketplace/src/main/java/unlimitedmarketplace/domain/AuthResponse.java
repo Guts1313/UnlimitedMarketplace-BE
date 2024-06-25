@@ -9,7 +9,6 @@ public class AuthResponse {
         this.refreshToken = refreshToken;
     }
 
-    // Getters and Setters
     public String getAccessToken() {
         return accessToken;
     }

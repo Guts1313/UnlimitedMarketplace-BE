@@ -30,13 +30,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import unlimitedmarketplace.business.impl.UserDetailsServiceImpl;
 
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 
 import javax.crypto.SecretKey;
 
 import java.util.Arrays;
 
 import java.util.List;
+import java.util.Random;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -56,12 +57,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")); // Use patterns for flexibility
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         // If you are using credentials (cookies, authentication), you must specify origins, not use '*'
         configuration.setAllowCredentials(true); // This should be set based on your specific needs
         configuration.setMaxAge(3600L); // 1 hour
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -85,7 +86,7 @@ public class SecurityConfig {
                             ("/unlimitedmarketplace/**"),
                             "/actuator/**","unlimitedmarketplace/auth/login").permitAll()
                     .requestMatchers("/unlimitedmarketplace/products/").authenticated()
-                    .requestMatchers("/websocket-sockjs-stomp/**").permitAll()  // Allow all WebSocket connection requests
+                    .requestMatchers("/websocket-sockjs-stomp/**").permitAll()
             ;
 
             request.anyRequest().permitAll();
@@ -99,7 +100,10 @@ public class SecurityConfig {
     public SecretKey jwtSecretKey() {
         return Keys.secretKeyFor(SignatureAlgorithm.HS256); // Secure key generation
     }
-
+    @Bean
+    public Random random() {
+        return new Random();
+    }
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,

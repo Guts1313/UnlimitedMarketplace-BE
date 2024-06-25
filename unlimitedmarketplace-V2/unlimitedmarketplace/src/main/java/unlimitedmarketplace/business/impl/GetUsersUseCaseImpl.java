@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import unlimitedmarketplace.business.GetUsersUseCase;
+import unlimitedmarketplace.business.interfaces.GetUsersUseCase;
 import unlimitedmarketplace.domain.GetAllUsersRequest;
 import unlimitedmarketplace.domain.GetAllUsersResponse;
 import unlimitedmarketplace.domain.User;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 
 import java.util.List;

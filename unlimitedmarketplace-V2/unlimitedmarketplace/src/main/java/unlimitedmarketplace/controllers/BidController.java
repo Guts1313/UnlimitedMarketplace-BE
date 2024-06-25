@@ -8,10 +8,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
-import unlimitedmarketplace.business.BidService;
-import unlimitedmarketplace.business.SubscriptionService;
+import unlimitedmarketplace.business.interfaces.BidService;
+import unlimitedmarketplace.business.impl.SubscriptionService;
 import unlimitedmarketplace.domain.*;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.persistence.entity.BidEntity;
 
 import java.math.BigDecimal;

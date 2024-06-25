@@ -5,7 +5,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import unlimitedmarketplace.persistence.RefreshTokenRepository;
+import unlimitedmarketplace.persistence.repositories.RefreshTokenRepository;
 import unlimitedmarketplace.persistence.entity.RefreshToken;
 import unlimitedmarketplace.security.RefreshTokenServiceImpl;
 

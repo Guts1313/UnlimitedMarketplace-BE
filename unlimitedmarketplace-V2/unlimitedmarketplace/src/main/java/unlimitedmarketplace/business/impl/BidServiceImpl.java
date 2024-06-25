@@ -7,14 +7,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import unlimitedmarketplace.business.BidService;
-import unlimitedmarketplace.domain.BidRequest;
-import unlimitedmarketplace.domain.GetMyBiddedProductsRequest;
-import unlimitedmarketplace.domain.GetMyBiddedProductsResponse;
-import unlimitedmarketplace.domain.ProductStatus;
-import unlimitedmarketplace.persistence.BidRepository;
-import unlimitedmarketplace.persistence.ProductRepository;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.business.interfaces.BidService;
+import unlimitedmarketplace.domain.*;
+import unlimitedmarketplace.persistence.repositories.BidRepository;
+import unlimitedmarketplace.persistence.repositories.ProductRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.persistence.entity.BidEntity;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 import unlimitedmarketplace.persistence.entity.UserEntity;
@@ -39,18 +36,8 @@ public class BidServiceImpl implements BidService {
         this.userRepository = userRepository;
     }
 
+    @Override
     public GetMyBiddedProductsResponse findBiddedProductsById(GetMyBiddedProductsRequest request) {
-
-//        List<ProductEntity> productEntities = bidRepository.findProductsByUserId(request.getUserId());
-//        for (ProductEntity prod: productEntities){
-//            Long prodId = prod.getId();
-//            BigDecimal latestPrice = findLatestBidAmountByProductId(prodId);
-//            prod.setProductPrice(latestPrice.doubleValue());
-//        }
-//        return GetMyBiddedProductsResponse.builder()
-//                .userBidProducts(productEntities)
-//                .userId(request.getUserId())
-//                .build();
         Long id = request.getUserId();
         List<BidEntity> userBidProducts = bidRepository.findBiddedProductsByUserId(id);
         GetMyBiddedProductsResponse response = new GetMyBiddedProductsResponse();
@@ -70,6 +57,7 @@ public class BidServiceImpl implements BidService {
             bidRepository.save(bid);
             ProductEntity product = bid.getProduct();
             product.setProductStatus(String.valueOf(ProductStatus.SOLD));
+            product.setPaymentStatus(String.valueOf(ProductPaymentStatus.AWAITING));
             productRepository.saveAndFlush(product);
         } else {
             logs.error("Bid not found with amount: {} and userId: {}", bidAmount, userId);
@@ -114,13 +102,12 @@ public class BidServiceImpl implements BidService {
                 throw new IllegalArgumentException("New bid must be higher than the current highest bid.");
             }
         }
-        // Allow the first bid on the product if no previous bids exist
         BidEntity newBid = new BidEntity();
         newBid.setAmount(bidRequest.getBidAmount());
         newBid.setBidTime(LocalDateTime.now());
         newBid.setProduct(product);
         newBid.setUser(user);
-
+        newBid.setBidStatus("SENT");
         return bidRepository.save(newBid);
     }
 

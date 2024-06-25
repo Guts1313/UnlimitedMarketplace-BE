@@ -1,4 +1,4 @@
-package unlimitedmarketplace.business;
+package unlimitedmarketplace.business.interfaces;
 
 
 import unlimitedmarketplace.domain.CreateUserRequest;

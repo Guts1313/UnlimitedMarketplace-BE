@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import unlimitedmarketplace.business.SubscriptionService;
-import unlimitedmarketplace.persistence.SubscriptionRepository;
+import unlimitedmarketplace.business.impl.SubscriptionService;
+import unlimitedmarketplace.persistence.repositories.SubscriptionRepository;
 import unlimitedmarketplace.persistence.entity.SubscriptionEntity;
 
 import java.util.Arrays;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SubscriptionServiceTest {
+ class SubscriptionServiceTest {
 
     @Mock
     private SubscriptionRepository subscriptionRepository;

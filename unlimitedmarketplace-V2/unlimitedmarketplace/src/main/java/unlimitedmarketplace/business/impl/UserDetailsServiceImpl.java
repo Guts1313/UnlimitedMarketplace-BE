@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 import java.util.Collections;
 

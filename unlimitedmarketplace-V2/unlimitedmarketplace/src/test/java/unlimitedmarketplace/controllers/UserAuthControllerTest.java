@@ -14,12 +14,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import unlimitedmarketplace.domain.UserRoles;
 import unlimitedmarketplace.domain.UserService;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 import unlimitedmarketplace.security.AccessTokenEncoderDecoderImpl;
@@ -27,25 +25,16 @@ import unlimitedmarketplace.security.RefreshTokenServiceImpl;
 import unlimitedmarketplace.util.JwtUtil;
 
 import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.fail;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-// Correct import for the post method
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")  // Ensure this profile configures the necessary beans and settings for tests
+@ActiveProfiles("test")
  class UserAuthControllerTest {
 
     @Autowired
@@ -58,8 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     private AuthenticationManager authenticationManager;
 
     @MockBean
-    private JwtUtil jwtUtil;
-    @MockBean
     private RefreshTokenServiceImpl refreshTokenService;
 
     @MockBean
@@ -68,7 +55,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @MockBean
     private UserService userService;
 
-    private static final Logger log = LoggerFactory.getLogger(UserAuthControllerTest.class);
 
     @BeforeEach
     void setUp() {
@@ -80,15 +66,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String username = "gosu";
         String passwordHash = "testpass";
 
-        // Create a mock UserEntity
         UserEntity mockUser = new UserEntity();
-        mockUser.setId(1L);  // Assuming the ID is a Long
+        mockUser.setId(1L);
         mockUser.setUserName(username);
 
-        // Mock UserService to return the mock user
         when(userService.findByUsername(username)).thenReturn(mockUser);
 
-        // Mock authentication
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, Collections.singletonList(new SimpleGrantedAuthority("USER")));
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authentication);
         when(tokenService.encodeAndGetId(anyString(), anyLong(), anyCollection())).thenReturn("dummyToken");
@@ -107,16 +90,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String expectedToken = "expectedDummyToken";
 
         UserEntity mockUser = new UserEntity();
-        mockUser.setId(1L);  // Assuming the ID is a Long
+        mockUser.setId(1L);
         mockUser.setUserName(username);
 
-        // Mock UserService to return the mock user
         when(userService.findByUsername(username)).thenReturn(mockUser);
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, Collections.singletonList(new SimpleGrantedAuthority("USER")));
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(authentication);
 
         when(tokenService.encodeAndGetId(anyString(), anyLong(), anyCollection())).thenReturn(expectedToken);
-        // Act & Assert
         mockMvc.perform(post("/unlimitedmarketplace/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"" + username + "\", \"passwordHash\":\"" + passwordHash + "\"}"))

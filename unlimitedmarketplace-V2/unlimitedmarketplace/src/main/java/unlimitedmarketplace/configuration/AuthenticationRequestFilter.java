@@ -20,6 +20,7 @@ import unlimitedmarketplace.security.AccessTokenDecoder;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -73,6 +74,8 @@ public class AuthenticationRequestFilter extends OncePerRequestFilter {
     }
 
     private void setupSpringSecurityContext(AccessToken accessToken) {
+        Set<String> roles = accessToken.getRoles();
+        log.info("roles from access token in setupSpringSecurityContext:{}", roles);
         List<GrantedAuthority> grantedAuthorities = accessToken.getRoles()
                 .stream()
                 .map(role -> new SimpleGrantedAuthority(SPRING_SECURITY_ROLE_PREFIX + role))

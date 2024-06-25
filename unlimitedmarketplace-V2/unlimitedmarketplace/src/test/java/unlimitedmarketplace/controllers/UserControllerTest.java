@@ -14,7 +14,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.Test;
-import unlimitedmarketplace.business.*;
+import unlimitedmarketplace.business.interfaces.CreateUserUseCase;
+import unlimitedmarketplace.business.interfaces.DeleteUserUseCase;
+import unlimitedmarketplace.business.interfaces.GetUsersUseCase;
+import unlimitedmarketplace.business.interfaces.UpdateUserPasswordUseCase;
 import unlimitedmarketplace.domain.*;
 
 import java.util.Arrays;
@@ -22,15 +25,12 @@ import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")  // Ensure this profile configures the necessary beans and settings for tests
+@ActiveProfiles("test")
 
  class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private GetUserUseCase getUserUseCase;
 
     @MockBean
     private GetUsersUseCase getUsersUseCase;
@@ -48,12 +48,10 @@ import java.util.List;
     @Test
     @WithMockUser(username="admin", roles={"ADMIN"})
      void getUsers_ShouldReturnAllUsers() throws Exception {
-        // Arrange
         List<User> userList = Arrays.asList(new User(1L, "userTest1","userTest1pw", "user1@test.com",UserRoles.ADMIN)); // Include role in constructor
         GetAllUsersResponse response = new GetAllUsersResponse(userList);
         given(getUsersUseCase.getAllUsers(any(GetAllUsersRequest.class))).willReturn(response);
 
-        // Act & Assert
         mockMvc.perform(get("/unlimitedmarketplace").param("userName", "userTest"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.allUsers").isNotEmpty())
@@ -66,14 +64,11 @@ import java.util.List;
     @WithMockUser(username="admin", roles={"USER", "ADMIN"})
 
      void createUser_ShouldReturnCreated() throws Exception {
-        // Arrange
         CreateUserRequest request = new CreateUserRequest("newUser", "newUser@test.com", "password", UserRoles.USER);
         CreateUserResponse response = new CreateUserResponse(1L, "newUser", "newUser@test.com", UserRoles.USER);
 
-        // Correctly setup Mockito to expect any valid CreateUserRequest and return the prepared response
         given(createUserUseCase.saveUser(any(CreateUserRequest.class))).willReturn(response);
 
-        // Prepare JSON content matching the structure of CreateUserRequest
         String jsonContent = """
         {
             "userName": "newUser",
@@ -82,7 +77,6 @@ import java.util.List;
             "role": "USER"
         }""";
 
-        // Act & Assert
         mockMvc.perform(post("/unlimitedmarketplace")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
@@ -99,10 +93,8 @@ import java.util.List;
     @WithMockUser(username="admin", roles={"USER", "ADMIN"})
 
      void updateUser_ShouldReturnNoContent() throws Exception {
-        // Arrange
         UpdateUserPasswordRequest request = new UpdateUserPasswordRequest(1L, "newPassword");
 
-        // Act & Assert
         mockMvc.perform(put("/unlimitedmarketplace/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"newPassword\":\"newPassword\"}"))
@@ -115,7 +107,6 @@ import java.util.List;
     @WithMockUser(username="admin", roles={"USER", "ADMIN"})
 
      void deleteUser_ShouldReturnNoContent() throws Exception {
-        // Act & Assert
         mockMvc.perform(delete("/unlimitedmarketplace/{id}", 1L))
                 .andExpect(status().isNoContent());
 

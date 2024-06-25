@@ -2,12 +2,12 @@ package unlimitedmarketplace.business.impl;
 
 
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.business.CreateProductUseCase;
+import unlimitedmarketplace.business.interfaces.CreateProductUseCase;
 import unlimitedmarketplace.domain.CreateProductRequest;
 import unlimitedmarketplace.domain.CreateProductResponse;
 import unlimitedmarketplace.domain.ProductStatus;
-import unlimitedmarketplace.persistence.ProductRepository;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.ProductRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 

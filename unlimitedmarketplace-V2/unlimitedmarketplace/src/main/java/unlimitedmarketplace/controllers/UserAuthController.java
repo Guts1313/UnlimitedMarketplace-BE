@@ -42,7 +42,6 @@ public class UserAuthController {
 
     @PostMapping("/login")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
-
     public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -63,9 +62,9 @@ public class UserAuthController {
             String jwt = tokenService.encodeAndGetId(authentication.getName(), userId, authentication.getAuthorities());
             String refreshToken = refreshTokenService.createRefreshToken(loginRequest.getUsername()); // Generate and store refresh token
             AccessToken token = tokenService.decodeEncoded(jwt);
-            logs.info("Acc tok: {}" , token);
-            logs.info("UID: {}" , userId);
-            logs.info("Generated JWT: {}" , jwt);
+            logs.info("Acc tok: {}", token);
+            logs.info("UID: {}", userId);
+            logs.info("Generated JWT: {}", jwt);
 
             if (jwt == null) {
                 logs.info("J%WT is null, %check tokenService and key configuration.");
@@ -76,10 +75,11 @@ public class UserAuthController {
             LoginResponse response = new LoginResponse(jwt, refreshToken, userId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logs.info("Error during authentication: {}" , e.getMessage());
+            logs.info("Error during authentication: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PostMapping("/refresh-token")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody Map<String, String> body) {
@@ -108,6 +108,7 @@ public class UserAuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @PostMapping("/logout")
     @CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
     public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {

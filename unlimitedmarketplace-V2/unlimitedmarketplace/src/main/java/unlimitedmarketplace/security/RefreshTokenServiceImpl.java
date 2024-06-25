@@ -1,7 +1,7 @@
 package unlimitedmarketplace.security;
 
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.persistence.RefreshTokenRepository;
+import unlimitedmarketplace.persistence.repositories.RefreshTokenRepository;
 import unlimitedmarketplace.persistence.entity.RefreshToken;
 
 import java.time.Instant;

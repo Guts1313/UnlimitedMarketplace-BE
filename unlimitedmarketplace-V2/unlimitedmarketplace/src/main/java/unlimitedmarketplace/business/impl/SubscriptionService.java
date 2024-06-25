@@ -1,7 +1,7 @@
-package unlimitedmarketplace.business;
+package unlimitedmarketplace.business.impl;
 
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.persistence.SubscriptionRepository;
+import unlimitedmarketplace.persistence.repositories.SubscriptionRepository;
 import unlimitedmarketplace.persistence.entity.SubscriptionEntity;
 
 import java.util.List;

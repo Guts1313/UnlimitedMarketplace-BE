@@ -13,7 +13,7 @@ public class BidResponse {
     private Long productId;
     private BigDecimal bidAmount;
     private String status;
-    private String name; // Optional: A message field to pass any relevant information or errors
+    private String name;
     private Long userId;
     public BidResponse(Long id, BigDecimal amount, String success) {
         this.productId=id;
@@ -26,6 +26,5 @@ public class BidResponse {
         this.name =success;
         this.userId=userId;
     }
-    // This constructor might be specifically useful for error messages
 
 }

@@ -2,10 +2,10 @@ package unlimitedmarketplace.business.impl;
 
 
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.business.GetProductUseCase;
+import unlimitedmarketplace.business.interfaces.GetProductUseCase;
 import unlimitedmarketplace.domain.GetProductRequest;
 import unlimitedmarketplace.domain.GetProductResponse;
-import unlimitedmarketplace.persistence.ProductRepository;
+import unlimitedmarketplace.persistence.repositories.ProductRepository;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 
 import java.util.Optional;

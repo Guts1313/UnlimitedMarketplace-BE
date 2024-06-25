@@ -3,11 +3,11 @@ package unlimitedmarketplace.business.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import unlimitedmarketplace.business.GetAllProductsUseCase;
+import unlimitedmarketplace.business.interfaces.GetAllProductsUseCase;
 import unlimitedmarketplace.domain.GetAllProductsRequest;
 import unlimitedmarketplace.domain.GetAllProductsResponse;
 import unlimitedmarketplace.domain.ProductStatus;
-import unlimitedmarketplace.persistence.ProductRepository;
+import unlimitedmarketplace.persistence.repositories.ProductRepository;
 import unlimitedmarketplace.persistence.entity.ProductEntity;
 
 import java.util.List;

@@ -3,7 +3,7 @@ package unlimitedmarketplace.domain;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.persistence.entity.UserEntity;
 import java.util.List;
 
@@ -27,6 +27,6 @@ public class UserService {
     public List<SimpleGrantedAuthority> getAuthoritiesByUsername(String username) {
         UserEntity user = findByUsername(username);
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getUserRole().name());
-        return List.of(authority);
+        return List.copyOf(List.of(authority));
     }
 }

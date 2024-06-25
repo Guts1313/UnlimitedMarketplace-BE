@@ -3,8 +3,8 @@ package unlimitedmarketplace.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import unlimitedmarketplace.business.DeleteUserUseCase;
-import unlimitedmarketplace.business.GetUsersUseCase;
+import unlimitedmarketplace.business.interfaces.DeleteUserUseCase;
+import unlimitedmarketplace.business.interfaces.GetUsersUseCase;
 import unlimitedmarketplace.domain.GetAllUsersRequest;
 import unlimitedmarketplace.domain.GetAllUsersResponse;
 

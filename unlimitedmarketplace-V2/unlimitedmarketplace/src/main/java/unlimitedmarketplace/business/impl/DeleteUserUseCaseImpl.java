@@ -1,9 +1,9 @@
 package unlimitedmarketplace.business.impl;
 
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.business.DeleteUserUseCase;
+import unlimitedmarketplace.business.interfaces.DeleteUserUseCase;
 import unlimitedmarketplace.business.exceptions.UserNotFoundException;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 
 @Service
 public class DeleteUserUseCaseImpl implements DeleteUserUseCase {

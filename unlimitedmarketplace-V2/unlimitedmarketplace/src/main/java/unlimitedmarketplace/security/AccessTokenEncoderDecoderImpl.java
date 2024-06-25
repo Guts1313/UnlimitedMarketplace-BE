@@ -91,7 +91,7 @@ public class AccessTokenEncoderDecoderImpl implements AccessTokenEncoder, Access
                     .map(String::toUpperCase) // Convert to upper case for consistency
                     .collect(Collectors.toSet());
 
-            log.info("Decoded roles: {}", rolesSet);
+            log.info("Decoded roles haha: {}", rolesList);
             return new AccessTokenImpl(claims.getSubject(), userId, rolesSet);
         } catch (JwtException e) {
             throw new InvalidAccessTokenException(e.getMessage());

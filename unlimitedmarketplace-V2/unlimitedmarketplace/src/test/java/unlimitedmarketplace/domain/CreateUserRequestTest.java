@@ -17,7 +17,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import unlimitedmarketplace.business.CreateUserUseCase;
+import unlimitedmarketplace.business.interfaces.CreateUserUseCase;
 import unlimitedmarketplace.business.exceptions.DuplicateEmailException;
 import unlimitedmarketplace.business.exceptions.DuplicateUsernameException;
 import unlimitedmarketplace.controllers.UserController;
@@ -87,27 +87,21 @@ import unlimitedmarketplace.controllers.UserController;
     }
     @Test
     void testCreateUserInternalServerError() {
-        // Arrange
         CreateUserRequest request = new CreateUserRequest("username", "email@example.com", "password123", UserRoles.ADMIN);
         when(createUserUseCase.saveUser(any())).thenThrow(new RuntimeException("Unexpected error"));
 
-        // Act
         ResponseEntity<?> response = userController.createUser(request);
 
-        // Assert
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertNull(response.getBody());  // Assuming no body is returned on errors
+        assertNull(response.getBody());
     }
     @Test
     void testCreateUserDuplicateEmail() {
-        // Arrange
         CreateUserRequest request = new CreateUserRequest("username", "duplicate@example.com", "password123", UserRoles.ADMIN);
         when(createUserUseCase.saveUser(any())).thenThrow(new DuplicateEmailException());
 
-        // Act
         ResponseEntity<?> response = userController.createUser(request);
 
-        // Assert
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNull(response.getBody());
     }
@@ -134,7 +128,7 @@ import unlimitedmarketplace.controllers.UserController;
                 .userName("username")
                 .email("email@example.com")
                 .passwordHash("password123")
-                .role(null)  // Explicitly setting role to null
+                .role(null)
                 .build();
 
         Errors errors = new BeanPropertyBindingResult(request, "createUserRequest");

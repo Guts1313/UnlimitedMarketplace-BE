@@ -2,10 +2,16 @@ package unlimitedmarketplace.persistence.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 
 @Table(name="app_products")
 public class ProductEntity {
@@ -26,7 +32,8 @@ public class ProductEntity {
     private String productDateAdded;
     @Column(name = "product_status")
     private String productStatus;
-
+    @Column(name = "payment_status")
+    private String paymentStatus;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)

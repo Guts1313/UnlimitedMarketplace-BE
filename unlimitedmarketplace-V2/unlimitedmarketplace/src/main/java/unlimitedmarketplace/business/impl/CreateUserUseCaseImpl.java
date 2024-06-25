@@ -4,10 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.business.CreateUserUseCase;
+import unlimitedmarketplace.business.interfaces.CreateUserUseCase;
 import unlimitedmarketplace.business.exceptions.DuplicateEmailException;
 import unlimitedmarketplace.business.exceptions.DuplicateUsernameException;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.domain.CreateUserRequest;
 import unlimitedmarketplace.domain.CreateUserResponse;
 import unlimitedmarketplace.persistence.entity.UserEntity;
@@ -33,7 +33,6 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             throw new DuplicateEmailException();
         }
 
-        // Proceed with creating the user if username and email are unique
         UserEntity userEntity = new UserEntity();
         userEntity.setUserName(request.getUserName());
         userEntity.setPasswordHash(passwordEncoder.encode(request.getPasswordHash())); // Hashing the password
@@ -41,7 +40,6 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
         userEntity.setUserRole(request.getRole());
         UserEntity savedUser = userRepository.save(userEntity);
 
-        // Return a response object
         return new CreateUserResponse(savedUser.getId(), savedUser.getUserName(), savedUser.getEmail(),savedUser.getUserRole());
     }
 

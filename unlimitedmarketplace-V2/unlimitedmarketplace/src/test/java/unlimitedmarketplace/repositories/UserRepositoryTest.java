@@ -4,7 +4,7 @@ package unlimitedmarketplace.repositories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

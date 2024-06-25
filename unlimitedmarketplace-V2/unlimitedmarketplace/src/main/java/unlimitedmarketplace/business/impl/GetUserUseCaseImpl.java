@@ -1,9 +1,9 @@
 package unlimitedmarketplace.business.impl;
 
 import org.springframework.stereotype.Service;
-import unlimitedmarketplace.business.GetUserUseCase;
+import unlimitedmarketplace.business.interfaces.GetUserUseCase;
 import unlimitedmarketplace.business.exceptions.UserNotFoundException;
-import unlimitedmarketplace.persistence.UserRepository;
+import unlimitedmarketplace.persistence.repositories.UserRepository;
 import unlimitedmarketplace.domain.GetUserResponse;
 
 

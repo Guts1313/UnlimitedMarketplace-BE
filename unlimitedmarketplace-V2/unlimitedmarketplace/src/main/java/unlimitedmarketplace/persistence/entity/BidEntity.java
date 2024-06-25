@@ -43,7 +43,6 @@ public class BidEntity {
 
     private UserEntity user;
 
-    // Getters and setters
 }
 
 
