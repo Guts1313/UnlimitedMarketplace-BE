@@ -138,9 +138,9 @@ public class BidController {
     public ResponseEntity<GetMyBiddedProductsResponse> getUserBids(@PathVariable Long userId) {
         try {
             GetMyBiddedProductsRequest request = GetMyBiddedProductsRequest.builder().userId(userId).build();
-
             GetMyBiddedProductsResponse userBidProducts = bidService.findBiddedProductsById(request);
-
+            BigDecimal totalBidAmount = bidService.getTotalBidAmountByUserId(userId);
+            userBidProducts.setTotalBidAmount(totalBidAmount);
             return ResponseEntity.ok(userBidProducts);
         } catch (Exception e) {
             log.error("Failed to fetch user bids: {}", e.getMessage(), e);

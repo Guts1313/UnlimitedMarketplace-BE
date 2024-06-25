@@ -14,7 +14,8 @@ import java.util.List;
 public interface BidRepository extends JpaRepository<BidEntity, Long> {
     @Query("SELECT b FROM BidEntity b WHERE b.product.id = :productId ORDER BY b.amount DESC")
     Page<BidEntity> findHighestBidByProductId(@Param("productId") Long productId, Pageable pageable);
-
+    @Query("SELECT SUM(b.amount) FROM BidEntity b WHERE b.user.id = :userId")
+    BigDecimal calculateTotalBidAmountByUserId(@Param("userId") Long userId);
     @Query("SELECT DISTINCT b.user.userName FROM BidEntity b WHERE b.product.id = :productId AND b.user.userName != :latestBidderUsername")
     List<String> findAllBiddersExceptLatest(@Param("productId") Long productId, @Param("latestBidderUsername") String latestBidderUsername);
     @Query("SELECT DISTINCT p FROM BidEntity b JOIN b.product p WHERE b.user.id = :userId")

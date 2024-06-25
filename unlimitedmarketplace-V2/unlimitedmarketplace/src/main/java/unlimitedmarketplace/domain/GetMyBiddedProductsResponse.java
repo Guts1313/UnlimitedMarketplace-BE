@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import unlimitedmarketplace.persistence.entity.BidEntity;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -14,4 +16,6 @@ import java.util.List;
 public class GetMyBiddedProductsResponse {
     private List<BidEntity> userBidProducts;
     private Long userId;
+    private BigDecimal totalBidAmount;
+
 }

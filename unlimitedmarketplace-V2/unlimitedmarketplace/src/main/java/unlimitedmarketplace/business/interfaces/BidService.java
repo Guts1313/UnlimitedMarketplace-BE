@@ -15,4 +15,6 @@ public interface BidService {
     List<String> getAllBiddersExceptLatest(Long productId, String latestBidderUsername);
 
     BidEntity acceptBid(Long userId,BigDecimal bidAmount);
+    BigDecimal getTotalBidAmountByUserId(Long userId);
+
 }

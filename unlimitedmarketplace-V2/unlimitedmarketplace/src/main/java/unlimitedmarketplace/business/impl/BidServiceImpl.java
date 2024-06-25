@@ -45,7 +45,10 @@ public class BidServiceImpl implements BidService {
         response.setUserBidProducts(userBidProducts);
         return response;
     }
-
+    @Override
+    public BigDecimal getTotalBidAmountByUserId(Long userId) {
+        return bidRepository.calculateTotalBidAmountByUserId(userId);
+    }
     @Transactional
     public BidEntity acceptBid(Long userId, BigDecimal bidAmount) {
         logs.info("User id in bidserviceimpl: {}" , userId);
