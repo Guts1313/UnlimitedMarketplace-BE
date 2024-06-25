@@ -10,7 +10,9 @@ import unlimitedmarketplace.domain.GetAllUsersResponse;
 
 @RestController
 @RequestMapping("/adminpanel")
-@CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+//@CrossOrigin(origins = "http://localhost:3000") // Replace with the URL of your React app
+@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
+
 public class AdminController {
     private final DeleteUserUseCase deleteUserUseCase;
     private final GetUsersUseCase getUsersUseCase;

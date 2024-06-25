@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/payments")
+@CrossOrigin(origins = "https://sem3-fe-frontend-myvoxyxc3a-lz.a.run.app")
 public class PaymentController {
     private final PaymentService paymentService;
     private final UserService userService;
