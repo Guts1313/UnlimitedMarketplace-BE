@@ -1,40 +1,75 @@
 stages:
-  - build
-  - test
+  - build_and_test
+  - docker_build
   - deploy
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  SONAR_HOST_URL: "http://192.168.0.181:9000"
+  SONAR_PROJECT_KEY: "unlimitedmarketplace_sonar"
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: "tcp://docker:2375"
+  PROJECT_ID: unlimitedmarketplace
+  REGION: europe-north1
+  GCLOUD_SERVICE_KEY: $GCLOUD_SERVICE_KEY
 
-before_script:
-  # Assuming Java is installed at this path; change it to your Java installation path if different
-  - $Env:JAVA_HOME = "C:\Users\acidburn\.jdks\corretto-19.0.2"
-  - $Env:PATH = "$Env:JAVA_HOME\bin;$Env:PATH"
+services:
+  - docker:dind
 
-build:
-  stage: build
+build_and_test:
+  stage: build_and_test
+  image: gradle:latest
   script:
-    - cd unlimitedmarketplace
-    - .\gradlew.bat build -x test  # Notice the change to PowerShell-friendly call
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace
+    - gradle clean build
+    - gradle test
+    - gradle sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_LOGIN
+  tags:
+    - docker
 
+docker_build:
+  stage: docker_build
+  image: google/cloud-sdk:latest
+  before_script:
+    - echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - gcloud config set project $PROJECT_ID
+    - gcloud services enable artifactregistry.googleapis.com
+    - gcloud auth configure-docker
+    - cd unlimitedmarketplace-V2/unlimitedmarketplace
+  script:
+    - docker build -t gcr.io/$PROJECT_ID/unlimitedmarketplace:latest -f Dockerfile .
+    - docker push gcr.io/$PROJECT_ID/unlimitedmarketplace:latest
+  tags:
+    - docker
+
+deploy:
+  stage: deploy
+  image: google/cloud-sdk:latest
+  before_script:
+    - echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
+    - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+    - gcloud config set project $PROJECT_ID
+    - gcloud services enable run.googleapis.com
+  script:
+    - |
+      BACKEND_URL=$(gcloud run deploy unlimitedmarketplace-backend --image gcr.io/$PROJECT_ID/unlimitedmarketplace:latest --region $REGION --platform managed --allow-unauthenticated --format="value(status.url)" --update-env-vars "SPRING_DATASOURCE_URL=jdbc:mysql://unlimitedmarketplacedb.cvkauiwso2wc.eu-north-1.rds.amazonaws.com:3306/unlimitedmarketplace?useSSL=false&allowPublicKeyRetrieval=true,SPRING_DATASOURCE_USERNAME=root,SPRING_DATASOURCE_PASSWORD=Dante1312,SPRING_JPA_HIBERNATE_DDL_AUTO=update,SPRING_JPA_SHOW_SQL=true,SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.MySQLDialect,SPRING_SECURITY_USER_NAME=user,SPRING_SECURITY_USER_PASSWORD=\$2a\$12\$m3c2pg8r9HxOnWvTv/mzZOlB197OrG0cdk6qoYO48PrseY1kCBB7C,JWT_SECRET=VGhpcyBpcyBhbiBleGFtcGxlIGJhc2U2NC1lbmNvZGVkIHNlY3JldCBrZXku,JWT_EXPIRATION=60")
+      echo "Backend URL: $BACKEND_URL"
+      echo "REACT_APP_BACKEND_URL=$BACKEND_URL" > backend_url.env
   artifacts:
     paths:
-      - build/libs/
-    expire_in: 1 hour
-
-test:
-  stage: test
-  script:
-    - cd unlimitedmarketplace
-    - .\gradlew.bat test  # Again, adjusted for PowerShell
-
-deploy_staging:
-  stage: deploy
-  script:
-    - echo "Deploying to staging server..."
-    # Add your Windows-specific deployment scripts here
+      - backend_url.env
   environment:
-    name: staging
-    url: http://staging.example.com
-  only:
-    - main
+    name: production
+    url: https://unlimitedmarketplace-backend.$REGION.run.app
+  tags:
+    - docker
+
+
+
+
+
+
+
+
+
+
