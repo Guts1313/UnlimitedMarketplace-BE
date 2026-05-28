@@ -1,92 +1,149 @@
-# SEMESTER3
+# Unlimited Marketplace — Backend
 
+Unlimited Marketplace is an online auction house for sneakers. Sellers put a pair of shoes up for sale, buyers bid against each other in real time, and the moment a seller accepts a bid the shoe is sold and the winner gets pinged to pay. Think of it as a stripped-down, sneaker-focused take on the live-auction experience — you watch the price climb, you get told the instant someone outbids you, and you find out straight away when you've won.
 
+This repository is the **backend**: a Spring Boot service that handles the accounts, the listings, the live bidding, and the payments. The React frontend lives in a separate repository and talks to this API.
 
-## Getting started
+> This started life as a Fontys ICT semester 3 project, so you'll see a few traces of that — a GitLab CI pipeline, SonarQube wiring, and design docs under `Documents/`.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## What it actually does
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- **Accounts & auth.** Users register, log in, and get a JWT back. Tokens are short-lived and there's a refresh-token flow so people aren't kicked out mid-auction. Passwords are stored BCrypt-hashed, never in plain text. There are two roles — regular `USER` and `ADMIN`.
+- **Listings.** A logged-in user can list a shoe (name, price, image URL) and browse everyone else's listings, optionally filtered by category. You can also pull up just your own listings. Each product carries a status (`ACTIVE` / `SOLD`) and a payment status (`AWAITING` / `PAID`).
+- **Live bidding.** This is the heart of it. Bids go over a WebSocket connection rather than plain HTTP, so when you place a bid everyone watching that product sees the new price immediately. If someone outbids you, you get a notification on your personal channel. When a seller accepts a bid, the winner is notified directly.
+- **Payments.** Winners can save payment methods and run a payment through to settle the auction. Each attempt is recorded as a transaction.
+- **Admin panel.** Admins can list all users and remove accounts.
 
-## Add your files
+## How the real-time bidding works
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+The bidding isn't request/response — it's a STOMP-over-WebSocket setup (with SockJS as the fallback). The flow looks like this:
+
+1. The client opens a socket to `/websocket-sockjs-stomp`, passing its JWT as an `access_token` query parameter. The handshake decodes the token and attaches the user's identity to the session, so the server always knows *who* is bidding.
+2. A bid is sent to `/app/placeBid`. The server saves it, then broadcasts the new amount to `/topic/product{id}` — every spectator on that product gets the update.
+3. Everyone who'd previously bid on that product (except the new top bidder) gets an "you've been outbid" message on `/queue/outbid{id}`.
+4. When the seller accepts a bid (`/app/acceptBid`), the winning bidder is messaged on `/queue/winner{id}`.
+
+Subscriptions are tracked server-side so the right people get the right notifications, and there's a small REST endpoint to read a user's active subscriptions back.
+
+## Tech stack
+
+| Area | Choice |
+|------|--------|
+| Language / runtime | Java 17 |
+| Framework | Spring Boot 3.2.3 (Web, Data JPA, Security, Validation, WebSocket) |
+| Real-time | STOMP over WebSocket + SockJS |
+| Auth | JWT (Auth0 `java-jwt` + `jjwt`), stateless sessions, refresh tokens |
+| Database | MySQL 8 in production, H2 in tests |
+| Build | Gradle (Kotlin DSL) |
+| Quality | JUnit, JaCoCo coverage, SonarQube |
+| Packaging | Docker (multi-stage) + Docker Compose |
+| Deployment | Google Cloud Run (image built and pushed via CI) |
+
+## Project layout
+
+The code follows a fairly classic layered structure, with use cases kept behind interfaces:
 
 ```
-cd existing_repo
-git remote add origin https://git.fhict.nl/I517171/semester3.git
-git branch -M main
-git push -uf origin main
+src/main/java/unlimitedmarketplace/
+├── controllers/    REST + WebSocket entry points (products, bids, payments, users, auth, admin)
+├── business/       Use cases — interfaces + impl, plus domain exceptions
+├── domain/         Request/response DTOs and enums (ProductStatus, UserRoles, ...)
+├── persistence/    JPA entities and Spring Data repositories
+├── security/       JWT encoding/decoding, access & refresh token handling
+├── configuration/  Security, CORS, and the STOMP/WebSocket config
+└── util/           Helpers (JWT utilities)
 ```
 
-## Integrate with your tools
+## API at a glance
 
-- [ ] [Set up project integrations](https://git.fhict.nl/I517171/semester3/-/settings/integrations)
+Most endpoints require a valid JWT (`Authorization: Bearer <token>`); creating an account and logging in don't.
 
-## Collaborate with your team
+**Auth** — `/unlimitedmarketplace/auth`
+- `POST /login` — log in, returns access token + refresh token + user id
+- `POST /refresh-token` — swap a refresh token for a fresh access token
+- `POST /logout` — invalidate a refresh token
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+**Users** — `/unlimitedmarketplace`
+- `POST /` — register a new user
+- `GET /{id}` — fetch your own profile
+- `PUT /{id}` — change password
+- `GET /` — list all users *(admin only)*
+- `DELETE /{id}` — delete a user *(admin only)*
 
-## Test and Deploy
+**Products** — `/unlimitedmarketplace/products`
+- `POST /` — list a shoe for auction
+- `GET /` — browse all listings (optional `?productCat=`)
+- `GET /mylistings?userId=` — your own listings
+- `GET /{id}` — a single listing
 
-Use the built-in continuous integration in GitLab.
+**Bids** — `/bids`
+- `GET /latest/{productId}` — current highest bid
+- `GET /user-bids/{userId}` — products a user has bid on + their total
+- WebSocket: `/app/placeBid`, `/app/acceptBid` (see the bidding section above)
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+**Payments** — `/payments`
+- `POST /add` — save a payment method
+- `GET /listpaymentoptions` — your saved payment methods
+- `POST /process` — process a payment
 
-***
+**Admin** — `/adminpanel`
+- `GET /users`, `DELETE /users/{userId}` *(admin only)*
 
-# Editing this README
+## Running it locally
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+You'll need Java 17 and a MySQL 8 instance (or just use Docker Compose, which brings its own).
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Option A — Docker Compose (easiest)
 
-## Name
-Choose a self-explaining name for your project.
+This spins up the app and a MySQL container together.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```bash
+cp .env.example .env      # then fill in real values
+docker compose up --build
+```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+The API comes up on `http://localhost:8080`, and MySQL is exposed on host port `3390` (mapped to avoid clashing with a local MySQL on 3306).
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Option B — Run it directly with Gradle
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+Point it at a MySQL database, set your environment variables, and start it:
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+```bash
+./gradlew bootRun
+```
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Configuration
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Everything sensitive is read from environment variables (with sane fallbacks in `application.properties`). Copy `.env.example` to `.env` and set at least:
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+| Variable | What it's for |
+|----------|---------------|
+| `SPRING_DATASOURCE_URL` | JDBC URL for MySQL |
+| `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` | DB credentials |
+| `JWT_SECRET` | Base64 HMAC secret for signing tokens (e.g. `openssl rand -base64 48`) |
+| `JWT_EXPIRATION` | Access-token lifetime in minutes |
+| `SERVER_PORT` | Port to run on (defaults to 8080) |
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Don't commit your real `.env` — it's git-ignored on purpose.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## Tests & quality
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+```bash
+./gradlew test            # run the test suite (uses H2)
+./gradlew jacocoTestReport # coverage report -> build/reports/jacoco
+./gradlew sonar            # push analysis to SonarQube (needs a running server)
+```
 
-## License
-For open source projects, say how it is licensed.
+Coverage runs automatically after the tests, and the report feeds straight into SonarQube.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Deployment
+
+The CI pipeline builds the app, runs tests and Sonar analysis, bakes a Docker image, pushes it to Google Container Registry, and deploys it to **Google Cloud Run** in `europe-north1`. The frontend is deployed separately on Cloud Run as well, which is why CORS in this service is locked to the deployed frontend's origin.
+
+## A note on scope
+
+This is a student project, so a few corners reflect that — CORS origins and a couple of URLs are hard-coded to the deployed environment, and the schema is managed by Hibernate's `ddl-auto=update` rather than migrations. It's built to demonstrate a full-stack auction system end to end, not to run a real sneaker exchange.
+
+---
+
+Built by **Angel Rusev**. Design documents, user stories, and the research report are in the `Documents/` folder.
